@@ -1,0 +1,26 @@
+[
+  {
+    "date": "28-07-2020",
+    "title": "How to set .env variables to Heroku dynamically with a .sh script",
+    "motivation": "This is very useful when your repository has a lot of changes in .env variables, so you dont need to update them manualy in heroku.",
+    "tech": ["heroku", "bash"]
+  },
+  {
+    "date": "28-07-2020",
+    "title": "How to add “Open with Windows Terminal” option to the context menu",
+    "motivation": "This is great for open the terminal in the folder you want directly, without having to use commands such as 'cd'.",
+    "tech": ["windows", "windows terminal"]
+  },
+  {
+    "date": "27-07-2020",
+    "title": "How to add “Open with WSL VS Code” to Windows Context Menu",
+    "motivation": "This is great for open the vscode in the folder you want directly, without having to use commands such as 'cd'.",
+    "tech": ["windows", "vscode"]
+  },
+  {
+    "date": "27-07-2020",
+    "title": "How to add a .bashrc equivalent to the windows cmd terminal",
+    "motivation": "This is useful to set your custom commands and functions and load them right away, instead of manually loading them.",
+    "tech": ["windows"]
+  }
+]
