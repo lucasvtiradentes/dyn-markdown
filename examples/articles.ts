@@ -1,7 +1,7 @@
-import { DMFIELD, MarkdownTable, RowContent, getJson } from '../src/index';
+import { DynMarkdown, MarkdownTable, RowContent, getJson } from '../src/index';
 
 const articlesJson = getJson('./examples/articles.json');
-const articlesMarkdown = new DMFIELD('./examples/articles.md');
+const articlesMarkdown = new DynMarkdown('./examples/articles.md');
 
 const articlesTable = new MarkdownTable();
 const headerContent: RowContent[] = [

@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 
-export { MarkdownTable, RowContent, getJson };
+export { DynMarkdown, MarkdownTable, RowContent, getJson };
 
 const FIELD_PREFIX = 'DMFIELD';
 
@@ -76,7 +76,7 @@ class MarkdownTable {
   }
 }
 
-export class DMFIELD {
+class DynMarkdown {
   private updatedFields: string[] = [];
   fields: string[] = [];
   markdownContent = '';

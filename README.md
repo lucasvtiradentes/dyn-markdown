@@ -1,7 +1,7 @@
 <a name="TOC"></a>
 
 <p align="center">
-  <img alt="posthoglogo" src="./.github/images/repo_banner_2428_332.png">
+  <img alt="posthoglogo" src="./.github/images/dyn_repo_banner_2428_332.png">
 </p>
 
 <div align="center">
@@ -156,7 +156,7 @@ The dyn-markdown comes with the following commands list:
     <th>Description</th>
   </tr>
   <tr>
-    <td rowspan="6">DMFIELD</td>
+    <td rowspan="8">DynMarkdown</td>
     <td><code>.markdownContent</code></td>
     <td>Access the current markdown file content.</td>
   </tr>
@@ -167,23 +167,33 @@ The dyn-markdown comes with the following commands list:
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.getJsonContent(jsonPath)</code></td>
-    <td>get json content.</td>
-  </tr>
-  <tr>
-    <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.createTable()</code></td>
-    <td>create a table (<b>MarkdownTable</b>) instance.</td>
-  </tr>
-  <tr>
-    <!-- <td rowspan="1">dyn-markdown</td> -->
     <td><code>.updateField(field, newContent)</code></td>
     <td>create a table instance.</td>
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.updateFile()</code></td>
+    <td><code>.saveFile()</code></td>
     <td>update the markdown file.</td>
+  </tr>
+  <tr>
+    <!-- <td rowspan="1">dyn-markdown</td> -->
+    <td><code>.deleteField(field)</code></td>
+    <td>delete an existing field in the markdown content.</td>
+  </tr>
+  <tr>
+    <!-- <td rowspan="1">dyn-markdown</td> -->
+    <td><code>.addSection(content, position, searchedLine?)</code></td>
+    <td>add a content to a specific position in the markdown.</td>
+  </tr>
+  <tr>
+    <!-- <td rowspan="1">dyn-markdown</td> -->
+    <td><code>.putContentInsideTag(content, htmlTag, options)</code></td>
+    <td>get a html tag with content</td>
+  </tr>
+  <tr>
+    <!-- <td rowspan="1">dyn-markdown</td> -->
+    <td><code>.putContentInsideNewField(content, field)</code></td>
+    <td>get html of a new field with a content inside.</td>
   </tr>
   <tr>
     <td rowspan="3">MarkdownTable</td>
@@ -199,6 +209,16 @@ The dyn-markdown comes with the following commands list:
     <!-- <td rowspan="4">MarkdownTable</td> -->
     <td><code>.getTable()</code></td>
     <td>get the table final content.</td>
+  </tr>
+  <tr>
+    <td rowspan="1">-</td>
+    <td><code>RowContent</code></td>
+    <td>type of array required by MarkdownTable.</td>
+  </tr>
+  <tr>
+    <td rowspan="1">-</td>
+    <td><code>getJson()</code></td>
+    <td>get the json content of a file.</td>
   </tr>
 </table>
 
@@ -279,12 +299,12 @@ we also have the following JSON file (`./articles.json`):
 so we create a typescript file (`update-content.ts`) with the following content:
 
 ```typescript
-import { DMFIELD } from 'dyn-markdown';
+import { DynMarkdown, MarkdownTable, getJson } from 'dyn-markdown';
 
-const articlesMarkdown = new DMFIELD('./examples/articles.md');
-const articlesJson = articlesMarkdown.getJsonContent('./examples/articles.json');
+const articlesJson = getJson('./examples/articles.json');
+const articlesMarkdown = new DynMarkdown('./examples/articles.md');
 
-const articlesTable = articlesMarkdown.createTable();
+const articlesTable = new MarkdownTable();
 articlesTable.setHeader([
   { content: 'date', width: 120 },
   { content: 'title', width: 600 },
@@ -304,7 +324,7 @@ articlesJson.forEach((item: any) => {
 
 articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable());
 articlesMarkdown.updateField('ARTICLES_NUMBER', 'ALL MY ARTICLES (70)');
-articlesMarkdown.updateFile();
+articlesMarkdown.saveFile();
 ```
 
 after run the above typescript code, all the content will be replaced. For more information, see the working example at the [EXAMPLES](./examples/) folder.
