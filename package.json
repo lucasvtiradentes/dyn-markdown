@@ -1,6 +1,6 @@
 {
   "name": "dyn-markdown",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "📖 update markdown tables and fields from json content automatically.",
   "license": "MIT",
   "keywords": [

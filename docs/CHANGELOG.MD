@@ -1,5 +1,7 @@
 # CHANGELOG HISTORY
 
+## 1.0.0 (2023-02-02)
+
 ## [1.3.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.2.0...v1.3.0) (2023-01-27)
 
 ### ✨ feature:
