@@ -1,5 +1,12 @@
 # CHANGELOG HISTORY
 
+## [1.1.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.0.0...v1.1.0) (2023-02-03)
+
+
+### ✨ feature:
+
+* add optional row merging in tables ([#3](https://github.com/lucasvtiradentes/dyn-markdown/issues/3)) ([b29ecb9](https://github.com/lucasvtiradentes/dyn-markdown/commit/b29ecb96eafa0f035b71a2f311e66aad9ba95bad))
+
 ## 1.0.0 (2023-02-02)
 
 ## [1.3.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.2.0...v1.3.0) (2023-01-27)
