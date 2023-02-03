@@ -1,5 +1,12 @@
 # CHANGELOG HISTORY
 
+## [1.2.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.1.0...v1.2.0) (2023-02-03)
+
+
+### ✨ feature:
+
+* add support to write in another files ([#5](https://github.com/lucasvtiradentes/dyn-markdown/issues/5)) ([9f2e896](https://github.com/lucasvtiradentes/dyn-markdown/commit/9f2e89638f74c6917e6d86030a0dd15fb2da985d))
+
 ## [1.1.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.0.0...v1.1.0) (2023-02-03)
 
 

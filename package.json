@@ -1,6 +1,6 @@
 {
   "name": "dyn-markdown",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "📖 easily handle markdown files in nodejs based projects, including add, update and delete fields dynamically.",
   "license": "MIT",
   "keywords": [
