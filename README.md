@@ -168,11 +168,6 @@ The dyn-markdown comes with the following commands list:
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.saveFile()</code></td>
-    <td>update the markdown file.</td>
-  </tr>
-  <tr>
-    <!-- <td rowspan="1">dyn-markdown</td> -->
     <td><code>.updateField(field, newContent)</code></td>
     <td>create a table instance.</td>
   </tr>
@@ -190,6 +185,11 @@ The dyn-markdown comes with the following commands list:
     <!-- <td rowspan="1">dyn-markdown</td> -->
     <td><code>.wrapContentInsideTag(content, htmlTag, options)</code></td>
     <td>get a html tag with content inside.</td>
+  </tr>
+  <tr>
+    <!-- <td rowspan="1">dyn-markdown</td> -->
+    <td><code>.saveFile({path?, overwrite?})</code></td>
+    <td>update the markdown file. you can either save into the same read file or in another one.</td>
   </tr>
   <tr>
     <td rowspan="3">MarkdownTable</td>

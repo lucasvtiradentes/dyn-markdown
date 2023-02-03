@@ -1,9 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename } from 'node:path';
+import { basename, dirname } from 'node:path';
 
 export { DynMarkdown, MarkdownTable, RowContent, getJson };
 
 const FIELD_PREFIX = 'DYNFIELD';
+
+type SaveOptions = { path?: string; overwrite?: boolean };
 
 type HtmlTag = 'p' | 'div' | 'span' | 'h4' | 'h3' | 'h2' | 'h1' | 'code';
 
@@ -354,8 +356,22 @@ class DynMarkdown {
 
   /* ======================================================================== */
 
-  saveFile() {
-    writeFileSync(this.markdownPath, this.markdownContent);
+  saveFile(options?: SaveOptions) {
+    let finalPath = this.markdownPath;
+
+    if (options?.path) {
+      if (!options?.overwrite && existsSync(options.path)) {
+        throw new Error(`the specified file already exists [${options.path}] and you didnt allow overwriting!`);
+      }
+
+      if (!dirname(options.path)) {
+        throw new Error(`the specified path folder doesnt exists [${options.path}]!`);
+      }
+
+      finalPath = options.path;
+    }
+
+    writeFileSync(finalPath, this.markdownContent);
     const updatedFields = this.updatedFields.length;
     if (updatedFields === 1) {
       console.log(`field ${this.updatedFields[0]} was updated in the [${basename(this.markdownPath)}]`);
