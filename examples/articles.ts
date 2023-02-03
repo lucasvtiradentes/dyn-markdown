@@ -12,6 +12,7 @@ const headerContent: RowContent[] = [
 ];
 
 articlesTable.setHeader(headerContent);
+
 articlesJson.forEach((item: any) => {
   const { date, title, motivation, tech } = item;
   const bodyRow: RowContent[] = [
@@ -23,6 +24,6 @@ articlesJson.forEach((item: any) => {
   articlesTable.addBodyRow(bodyRow);
 });
 
-articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable());
-articlesMarkdown.updateField('ARTICLES_NUMBER', 'ALL MY ARTICLES (40)');
+articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
+articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
 articlesMarkdown.saveFile();

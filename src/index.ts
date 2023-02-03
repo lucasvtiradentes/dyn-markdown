@@ -3,9 +3,9 @@ import { basename } from 'node:path';
 
 export { DynMarkdown, MarkdownTable, RowContent, getJson };
 
-const FIELD_PREFIX = 'DMFIELD';
+const FIELD_PREFIX = 'DYNFIELD';
 
-type HtmlTag = 'p' | 'div' | 'span' | 'h4' | 'h3' | 'h2' | 'h1';
+type HtmlTag = 'p' | 'div' | 'span' | 'h4' | 'h3' | 'h2' | 'h1' | 'code';
 
 type Alignment = 'center' | 'left' | 'right' | 'justify';
 
@@ -29,7 +29,8 @@ function getJson(jsonFile: string) {
 
 class MarkdownTable {
   private headerMD = '';
-  private bodyMD = '';
+  private headerItems: RowContent[] = [];
+  private bodyItems: RowContent[][] = [];
 
   setHeader(header: RowContent[]) {
     let allHeaderRows = '';
@@ -37,27 +38,62 @@ class MarkdownTable {
     for (const col of header) {
       allHeaderRows = allHeaderRows + this.addRow(col, 'header') + '\n';
     }
-
+    this.headerItems = header;
     this.headerMD = '  <tr>' + '\n' + allHeaderRows + '  </tr>';
   }
 
   addBodyRow(body: RowContent[]) {
-    let curRow = '';
-
-    for (const col of body) {
-      curRow = curRow + this.addRow(col, 'body') + '\n';
-    }
-
-    curRow = '  <tr>' + '\n' + curRow + '  </tr>';
-    this.bodyMD = (this.bodyMD === '' ? '' : this.bodyMD + '\n') + curRow;
+    this.bodyItems.push(body);
   }
 
-  getTable() {
-    const markdownTable = '<table>' + '\n' + this.headerMD + '\n' + this.bodyMD + '\n' + '</table>';
+  private getBodyMd(allBody: RowContent[][], columnToJoinIndex?: number) {
+    let allBodyMD = '';
+    const uniqueItems: string[] = [];
+
+    for (const body of allBody) {
+      let curRow = '';
+
+      body.forEach((col, index) => {
+        if (columnToJoinIndex !== undefined && index === columnToJoinIndex) {
+          if (!uniqueItems.includes(col.content)) {
+            const qnt = allBody.map((item) => item[columnToJoinIndex]).filter((item) => item?.content === col.content).length;
+            uniqueItems.push(col.content);
+            curRow = curRow + this.addRow(col, 'body', { quantity: qnt }) + '\n';
+          } else {
+            curRow = curRow + this.addRow(col, 'body', { comment: true }) + '\n';
+          }
+        } else {
+          curRow = curRow + this.addRow(col, 'body') + '\n';
+        }
+      });
+
+      curRow = '  <tr>' + '\n' + curRow + '  </tr>';
+      allBodyMD = (allBodyMD === '' ? '' : allBodyMD + '\n') + curRow;
+    }
+
+    return allBodyMD;
+  }
+
+  getTable(columnToJoin?: string) {
+    let finalBody = '';
+
+    if (columnToJoin) {
+      const allColumns = this.headerItems.map((item) => item.content);
+      if (!allColumns.includes(columnToJoin)) {
+        throw new Error(`you must specify a valid column to join: [${columnToJoin}] is not part of [${allColumns.join(', ')}]`);
+      }
+
+      const columnIndex = this.headerItems.findIndex((item) => item.content === columnToJoin);
+      finalBody = this.getBodyMd(this.bodyItems, columnIndex);
+    } else {
+      finalBody = this.getBodyMd(this.bodyItems);
+    }
+
+    const markdownTable = '<table>' + '\n' + this.headerMD + '\n' + finalBody + '\n' + '</table>';
     return markdownTable;
   }
 
-  private addRow(col: RowContent, type: 'header' | 'body') {
+  private addRow(col: RowContent, type: 'header' | 'body', options?: { quantity?: number; comment?: true }) {
     const { content, width, align } = col;
     const rowType = type === 'header' ? 'th' : 'td';
 
@@ -70,6 +106,14 @@ class MarkdownTable {
 
     if (align) {
       row = row.replace(`<${rowType}`, `<${rowType} align="${align}"`);
+    }
+
+    if (options?.quantity) {
+      row = row.replace(`<${rowType}`, `<${rowType} rowspan="${options?.quantity}"`);
+    }
+
+    if (options?.comment) {
+      row = `<!-- ${row} -->`;
     }
 
     return row;
@@ -139,7 +183,7 @@ class DynMarkdown {
     }
 
     if (validFields.length === 0) {
-      throw new Error('no dynamic field was found, add at least one before using `dyn-markdown`');
+      throw new Error(`no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`);
     }
 
     validFields.forEach((field) => {
@@ -152,45 +196,6 @@ class DynMarkdown {
   }
 
   /* ======================================================================== */
-
-  deleteField(field: string) {
-    if (!this.fields.includes(field)) {
-      throw new Error(`field [${field}] was not found in the file!\nthe current fields are: ${this.fields.join(', ')}\n`);
-    }
-
-    const contentSplitedArr = this.markdownContent.split(/\r?\n/);
-    const searchString = `${FIELD_PREFIX}:${field}`;
-
-    let initialRow = NaN;
-    let finalRow = NaN;
-
-    const updatedMarkdown = contentSplitedArr.reduce((acc: any, line: string, index: number) => {
-      const isInitialRow = line.search(`<${searchString}>`) > -1;
-      const isFinalRow = line.search(`</${searchString}>`) > -1;
-
-      if (isInitialRow) {
-        initialRow = index;
-        return acc;
-      } else if (isFinalRow) {
-        finalRow = index;
-        return acc;
-      } else if (Number.isNaN(initialRow)) {
-        // before initialRow
-        const row = acc ? acc + '\n' + line : line;
-        return row;
-      } else if (!Number.isNaN(finalRow)) {
-        // after finalRow
-        const row = acc ? acc + '\n' + line : line;
-        return row;
-      } else {
-        // between initialRow and finalRow
-        return acc;
-      }
-    }, '');
-
-    this.markdownContent = updatedMarkdown;
-    this.fields = this.getFields(this.markdownContent);
-  }
 
   updateField(fieldToupdate: string, newContent: string) {
     if (!this.fields.includes(fieldToupdate)) {
@@ -241,7 +246,46 @@ class DynMarkdown {
     this.updatedFields.push(fieldToupdate);
   }
 
-  putContentInsideTag(content: string, tag: HtmlTag, options: { align?: Alignment }) {
+  deleteField(field: string) {
+    if (!this.fields.includes(field)) {
+      throw new Error(`field [${field}] was not found in the file!\nthe current fields are: ${this.fields.join(', ')}\n`);
+    }
+
+    const contentSplitedArr = this.markdownContent.split(/\r?\n/);
+    const searchString = `${FIELD_PREFIX}:${field}`;
+
+    let initialRow = NaN;
+    let finalRow = NaN;
+
+    const updatedMarkdown = contentSplitedArr.reduce((acc: any, line: string, index: number) => {
+      const isInitialRow = line.search(`<${searchString}>`) > -1;
+      const isFinalRow = line.search(`</${searchString}>`) > -1;
+
+      if (isInitialRow) {
+        initialRow = index;
+        return acc;
+      } else if (isFinalRow) {
+        finalRow = index;
+        return acc;
+      } else if (Number.isNaN(initialRow)) {
+        // before initialRow
+        const row = acc ? acc + '\n' + line : line;
+        return row;
+      } else if (!Number.isNaN(finalRow)) {
+        // after finalRow
+        const row = acc ? acc + '\n' + line : line;
+        return row;
+      } else {
+        // between initialRow and finalRow
+        return acc;
+      }
+    }, '');
+
+    this.markdownContent = updatedMarkdown;
+    this.fields = this.getFields(this.markdownContent);
+  }
+
+  wrapContentInsideTag(content: string, tag: HtmlTag, options: { align?: Alignment }) {
     let finalContent = `<${tag}>${content}</${tag}>`;
 
     if (options.align) {
@@ -250,17 +294,6 @@ class DynMarkdown {
 
     return finalContent;
   }
-
-  putContentInsideNewField(content: string, field: string) {
-    if (this.fields.includes(field)) {
-      throw new Error(`this function is meant to be used to add a new field, you specified an existing one: ${field}!`);
-    }
-
-    const fieldHtmlTag = `${FIELD_PREFIX}:${field}`;
-    return `<!-- <${fieldHtmlTag}> -->\n${content}\n<!-- </${fieldHtmlTag}> -->`;
-  }
-
-  /* ======================================================================== */
 
   addSection(content: string, position: 'begin' | 'end' | 'line_after' | 'line_before', searchedLine?: string) {
     if (position.search('line') > -1 && !searchedLine) {

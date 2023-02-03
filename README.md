@@ -114,8 +114,9 @@ The `main goal` of dyn-markdown is to provide a way to `quick and easily update 
 
 ## :dart: Features<a href="#TOC"><img align="right" src="./.github/images/up_arrow.png" width="22"></a>
 
-&nbsp;&nbsp;&nbsp;✔️ easily update markdown fields (numbers, tables, etc);<br>
-&nbsp;&nbsp;&nbsp;✔️ provides a easy way to get content form json files;<br>
+&nbsp;&nbsp;&nbsp;✔️ easily add, update or remove markdown fields (numbers, tables, etc);<br>
+&nbsp;&nbsp;&nbsp;✔️ provides an easy way to get content form json files;<br>
+&nbsp;&nbsp;&nbsp;✔️ powerful and simple way to deal with tables;<br>
 &nbsp;&nbsp;&nbsp;✔️ allow you to see the current content before you update the file;<br>
 &nbsp;&nbsp;&nbsp;✔️ allow you to see which dynamic fields were found;<br>
 &nbsp;&nbsp;&nbsp;✔️ works in typescript, javascript commonjs and javascript modules.<br>
@@ -156,24 +157,24 @@ The dyn-markdown comes with the following commands list:
     <th>Description</th>
   </tr>
   <tr>
-    <td rowspan="8">DynMarkdown</td>
+    <td rowspan="7">DynMarkdown</td>
     <td><code>.markdownContent</code></td>
     <td>Access the current markdown file content.</td>
   </tr>
   <tr>
-    <!-- <td rowspan="6">DMFIELD</td> -->
+    <!-- <td rowspan="6">DYNFIELD</td> -->
     <td><code>.fields</code></td>
     <td>Shows the dynamic fields found on the specified file.</td>
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.updateField(field, newContent)</code></td>
-    <td>create a table instance.</td>
+    <td><code>.saveFile()</code></td>
+    <td>update the markdown file.</td>
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.saveFile()</code></td>
-    <td>update the markdown file.</td>
+    <td><code>.updateField(field, newContent)</code></td>
+    <td>create a table instance.</td>
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
@@ -187,13 +188,8 @@ The dyn-markdown comes with the following commands list:
   </tr>
   <tr>
     <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.putContentInsideTag(content, htmlTag, options)</code></td>
-    <td>get a html tag with content</td>
-  </tr>
-  <tr>
-    <!-- <td rowspan="1">dyn-markdown</td> -->
-    <td><code>.putContentInsideNewField(content, field)</code></td>
-    <td>get html of a new field with a content inside.</td>
+    <td><code>.wrapContentInsideTag(content, htmlTag, options)</code></td>
+    <td>get a html tag with content inside.</td>
   </tr>
   <tr>
     <td rowspan="3">MarkdownTable</td>
@@ -207,8 +203,8 @@ The dyn-markdown comes with the following commands list:
   </tr>
   <tr>
     <!-- <td rowspan="4">MarkdownTable</td> -->
-    <td><code>.getTable()</code></td>
-    <td>get the table final content.</td>
+    <td><code>.getTable(columnToJoin?)</code></td>
+    <td>get the table final content. if specified it also merge rows with the same value.</td>
   </tr>
   <tr>
     <td rowspan="1">-</td>
@@ -228,7 +224,7 @@ just to mention, the RowContent has the following type:
 type RowContent = {
   content: string;
   width?: number;
-  align?: 'center' | 'left' | 'right' | 'jsutify';
+  align?: 'center' | 'left' | 'right' | 'justify';
 };
 ```
 
@@ -238,15 +234,15 @@ Lets supose we have a markdown file (`'./articles.md'`) with the following conte
 
 ```markdown
 <h3 align="center">
-  <!-- <DMFIELD:ARTICLES_NUMBER> -->
+  <!-- <DYNFIELD:ARTICLES_NUMBER> -->
   ALL MY ARTICLES (70)
-  <!-- </DMFIELD:ARTICLES_NUMBER> -->
+  <!-- </DYNFIELD:ARTICLES_NUMBER> -->
 </h3>
 
 <h3>NODEJS UTILITIES</h3>
 
 <div align="center">
-  <!-- <DMFIELD:NODEJS_UTILITIES> -->
+  <!-- <DYNFIELD:NODEJS_UTILITIES> -->
     <table>
       <tr>
         <th align="left" width="120">date</th>
@@ -261,7 +257,7 @@ Lets supose we have a markdown file (`'./articles.md'`) with the following conte
         <td align="center">heroku, bash</td>
       </tr>
     </table>
-  <!-- </DMFIELD:NODEJS_UTILITIES> -->
+  <!-- </DYNFIELD:NODEJS_UTILITIES> -->
 </div>
 ```
 
@@ -478,7 +474,7 @@ And also this project used the following packages:
 
 ### Code style
 
-There's not a named convention used in this project (like [airbnb](https://github.com/airbnb/javascript), for instance), instead we specified he settings we like the most in prettier. You can check these settings in the [.prettierrc](./.prettierrc) file.
+There's not a named convention used in this project (like [airbnb](https://github.com/airbnb/javascript), for instance), instead we specified he settings we like the most in prettier. You can check these settings in the [.prettierrc](./.prettierrc.json) file.
 
 ### Commit messages style
 
@@ -558,7 +554,6 @@ Another ways to positivily impact this project is to:
 Any questions or suggestions? You are welcome to discuss it on:
 
 - [Github discussions](https://github.com/lucasvtiradentes/dyn-markdown/discussions)
-- [Gitter](https://gitter.im/ts_boilerplate_land/community)
 - [Email](mailto:lucasvtiradentes@gmail.com)
 
 ## Acknowledgements
@@ -576,5 +571,5 @@ This project is an idea of [@lucasvtiradentes](https://github.com/lucasvtiradent
   </p>
   <p>Made with ❤️ by Lucas Vieira.</p>
   <p>👉 See also all <a href="https://github.com/lucasvtiradentes/lucasvtiradentes/blob/master/portfolio/PROJECTS.md#TOC">my projects</a></p>
-  <p>👉 See also all <a href="https://github.com/lucasvtiradentes/lucasvtiradentes/blob/master/portfolio/ARTICLES.md#TOC">my articles</a></p>
+  <p>👉 See also all <a href="https://github.com/lucasvtiradentes/my-tutorials#readme">my articles</a></p>
 </div>

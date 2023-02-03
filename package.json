@@ -1,7 +1,7 @@
 {
   "name": "dyn-markdown",
   "version": "1.0.0",
-  "description": "📖 update markdown tables and fields from json content automatically.",
+  "description": "📖 easily handle markdown files in nodejs based projects, including add, update and delete fields dynamically.",
   "license": "MIT",
   "keywords": [
     "markdown",
@@ -44,8 +44,8 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:staged": "lint-staged --concurrent false --quiet",
-    "scripts:gitmoji": "ts-node ./scripts/gitmoji-util.ts",
-    "scripts:issues": "ts-node ./scripts/github-issues-util.ts"
+    "script:gitmoji": "ts-node ./scripts/gitmoji-util.ts",
+    "script:issues": "ts-node ./scripts/github-issues-util.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
