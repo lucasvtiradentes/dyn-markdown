@@ -2,32 +2,17 @@
 
 # FOLDERS ###############################
 
-.git/
 .github/
 .husky/
 .vscode/
 coverage/
-ignore/
 dist/
+docs/
+# examples
+ignore/
 node_modules/
+# scripts
+# src
+# tests
 
 # FILES #################################
-
-.commitlintrc
-.czrc
-.editorconfig
-.eslintignore
-.eslintrc.json
-.gitignore
-.lintstagedrc
-.npmignore
-.prettierignore
-.prettierrc.json
-jest.config.js
-package.json
-release.config.js
-tsconfig.json
-
-package-lock.json
-yarn.lock
-pnpm-lock.yaml

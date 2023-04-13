@@ -3,9 +3,8 @@
 # FOLDERS ###############################
 
 coverage/
+dist/
 ignore/
-dist/
-dist/
 node_modules/
 
 # FILES #################################
