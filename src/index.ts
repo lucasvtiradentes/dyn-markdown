@@ -1,21 +1,19 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
 
-export { DynMarkdown, MarkdownTable, RowContent, getJson };
-
 const FIELD_PREFIX = 'DYNFIELD';
 
-type SaveOptions = { path?: string; overwrite?: boolean };
-
-type HtmlTag = 'p' | 'div' | 'span' | 'h4' | 'h3' | 'h2' | 'h1' | 'code';
+type SaveFileOptions = { path?: string; overwrite?: boolean };
 
 type Alignment = 'center' | 'left' | 'right' | 'justify';
 
-type RowContent = {
+type CellContent = {
   content: string;
   width?: number;
   align?: Alignment;
 };
+
+type RowContent = CellContent[];
 
 type Field = {
   fieldName: string;
@@ -31,10 +29,13 @@ function getJson(jsonFile: string) {
 
 class MarkdownTable {
   private headerMD = '';
-  private headerItems: RowContent[] = [];
-  private bodyItems: RowContent[][] = [];
+  private headerItems: RowContent = [];
+  private bodyItems: RowContent[] = [];
+  ERRORS = {
+    columnNotFound: (column: string, allColumns: string) => `you must specify a valid column to join: [${column}] is not part of [${allColumns}]`
+  };
 
-  setHeader(header: RowContent[]) {
+  setHeader(header: RowContent) {
     let allHeaderRows = '';
 
     for (const col of header) {
@@ -44,11 +45,11 @@ class MarkdownTable {
     this.headerMD = '  <tr>' + '\n' + allHeaderRows + '  </tr>';
   }
 
-  addBodyRow(body: RowContent[]) {
+  addBodyRow(body: RowContent) {
     this.bodyItems.push(body);
   }
 
-  private getBodyMd(allBody: RowContent[][], columnToJoinIndex?: number) {
+  private getBodyMd(allBody: RowContent[], columnToJoinIndex?: number) {
     let allBodyMD = '';
     const uniqueItems: string[] = [];
 
@@ -82,7 +83,7 @@ class MarkdownTable {
     if (columnToJoin) {
       const allColumns = this.headerItems.map((item) => item.content);
       if (!allColumns.includes(columnToJoin)) {
-        throw new Error(`you must specify a valid column to join: [${columnToJoin}] is not part of [${allColumns.join(', ')}]`);
+        throw new Error(this.ERRORS.columnNotFound(columnToJoin, allColumns.join(', ')));
       }
 
       const columnIndex = this.headerItems.findIndex((item) => item.content === columnToJoin);
@@ -95,7 +96,7 @@ class MarkdownTable {
     return markdownTable;
   }
 
-  private addRow(col: RowContent, type: 'header' | 'body', options?: { quantity?: number; comment?: true }) {
+  private addRow(col: CellContent, type: 'header' | 'body', options?: { quantity?: number; comment?: true }) {
     const { content, width, align } = col;
     const rowType = type === 'header' ? 'th' : 'td';
 
@@ -126,11 +127,24 @@ class DynMarkdown {
   private updatedFields: string[] = [];
   fields: string[] = [];
   markdownContent = '';
+  ERRORS = {
+    noFieldsFound: `no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`,
+    fileDoesNotExist: (file: string) => `specified file [${file}] does not exist`,
+    folderDoesNotExist: (folder: string) => `the specified path folder doesnt exists [${folder}]!`,
+    outputFileAlreadyExists: (file: string) => `the specified file already exists [${file}] and you didnt allow overwriting!`,
+    fieldWithNoClosingTag: (field: string) => `every even field must be an ending one: ${field}`,
+    fieldWithNoOpeningTag: (field: string) => `every odd field must be an opening one: ${field}`,
+    overlapingFields: (field1: string, field2: string) => `fields [${field1}] and [${field2}] have errors, please make sure that the fields are open and closed sequentially.`,
+    fieldNameWithSpaces: (field: string) => `a field should not have space in its name: ${field}`,
+    missingField: (field: string, validFields: string) => `field [${field}] was not found in the file!\nthe current fields are: ${validFields}\n`,
+    mustSpecifyLineToSearch: `when using 'line_after' or 'line_before', you must specify a line to search`
+  };
 
   constructor(private markdownPath: string) {
     if (!existsSync(markdownPath)) {
-      throw new Error(`markdown file [${markdownPath}] does not exists!`);
+      throw new Error(this.ERRORS.fileDoesNotExist(markdownPath));
     }
+
     this.markdownPath = markdownPath;
     this.markdownContent = readFileSync(markdownPath, 'utf8');
     this.fields = this.getFields(this.markdownContent);
@@ -169,15 +183,15 @@ class DynMarkdown {
 
       if (x % 2 === 0) {
         if (curField.fieldType === 'close') {
-          throw new Error(`every even field must be an ending one: ${curField.fieldName}`);
+          throw new Error(this.ERRORS.fieldWithNoClosingTag(curField.fieldName));
         }
       } else {
         if (curField.fieldType === 'open') {
-          throw new Error(`every odd field must be an opening one: ${curField.fieldName}`);
+          throw new Error(this.ERRORS.fieldWithNoOpeningTag(curField.fieldName));
         }
 
         if (curField.fieldName !== tmpFields[x - 1]?.fieldName) {
-          throw new Error(`fields [${curField.fieldName}] and [${tmpFields[x - 1]?.fieldName}] have errors, please make sure that the fields are open and closed sequentially.`);
+          throw new Error(this.ERRORS.overlapingFields(curField.fieldName, tmpFields[x - 1]?.fieldName));
         }
 
         validFields.push(curField.fieldName);
@@ -185,12 +199,12 @@ class DynMarkdown {
     }
 
     if (validFields.length === 0) {
-      throw new Error(`no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`);
+      throw new Error(this.ERRORS.noFieldsFound);
     }
 
     validFields.forEach((field) => {
       if (field.search(' ') > -1) {
-        throw new Error(`a field should not have space in its name: ${field}`);
+        throw new Error(this.ERRORS.fieldNameWithSpaces(field));
       }
     });
 
@@ -201,7 +215,7 @@ class DynMarkdown {
 
   updateField(fieldToupdate: string, newContent: string) {
     if (!this.fields.includes(fieldToupdate)) {
-      throw new Error(`field [${fieldToupdate}] was not found in the file!\nthe current fields are: ${this.fields.join(', ')}\n`);
+      throw new Error(this.ERRORS.missingField(fieldToupdate, this.fields.join(', ')));
     }
 
     const contentSplitedArr = this.markdownContent.split(/\r?\n/);
@@ -250,7 +264,7 @@ class DynMarkdown {
 
   deleteField(field: string) {
     if (!this.fields.includes(field)) {
-      throw new Error(`field [${field}] was not found in the file!\nthe current fields are: ${this.fields.join(', ')}\n`);
+      throw new Error(this.ERRORS.missingField(field, this.fields.join(', ')));
     }
 
     const contentSplitedArr = this.markdownContent.split(/\r?\n/);
@@ -287,19 +301,9 @@ class DynMarkdown {
     this.fields = this.getFields(this.markdownContent);
   }
 
-  wrapContentInsideTag(content: string, tag: HtmlTag, options: { align?: Alignment }) {
-    let finalContent = `<${tag}>${content}</${tag}>`;
-
-    if (options.align) {
-      finalContent = finalContent.replace(`<${tag}`, `<${tag} align="${options?.align}"`);
-    }
-
-    return finalContent;
-  }
-
   addSection(content: string, position: 'begin' | 'end' | 'line_after' | 'line_before', searchedLine?: string) {
     if (position.search('line') > -1 && !searchedLine) {
-      throw new Error('you must specify the line to search');
+      throw new Error(this.ERRORS.mustSpecifyLineToSearch);
     }
 
     const contentSplitedArr = this.markdownContent.split(/\r?\n/);
@@ -356,16 +360,16 @@ class DynMarkdown {
 
   /* ======================================================================== */
 
-  saveFile(options?: SaveOptions) {
+  saveFile(options?: SaveFileOptions) {
     let finalPath = this.markdownPath;
 
     if (options?.path) {
       if (!options?.overwrite && existsSync(options.path)) {
-        throw new Error(`the specified file already exists [${options.path}] and you didnt allow overwriting!`);
+        throw new Error(this.ERRORS.outputFileAlreadyExists(options.path));
       }
 
       if (!dirname(options.path)) {
-        throw new Error(`the specified path folder doesnt exists [${options.path}]!`);
+        throw new Error(this.ERRORS.folderDoesNotExist(options.path));
       }
 
       finalPath = options.path;
@@ -381,3 +385,5 @@ class DynMarkdown {
     }
   }
 }
+
+export { DynMarkdown, MarkdownTable, getJson };

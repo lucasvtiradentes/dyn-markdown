@@ -1,10 +1,13 @@
-import { DynMarkdown, MarkdownTable, RowContent, getJson } from '../src/index';
+import { DynMarkdown, MarkdownTable, getJson } from '../src/index';
+
+type RowContent = MarkdownTable['headerItems'];
 
 const articlesJson = getJson('./examples/articles.json');
 const articlesMarkdown = new DynMarkdown('./examples/articles.md');
 
 const articlesTable = new MarkdownTable();
-const headerContent: RowContent[] = [
+
+const headerContent: RowContent = [
   { content: 'date', width: 120 },
   { content: 'title', width: 600 },
   { content: 'motivation', width: 300 },
@@ -15,7 +18,7 @@ articlesTable.setHeader(headerContent);
 
 articlesJson.forEach((item: any) => {
   const { date, title, motivation, tech } = item;
-  const bodyRow: RowContent[] = [
+  const bodyRow: RowContent = [
     { content: date, align: 'center' },
     { content: title, align: 'center' },
     { content: motivation, align: 'left' },
