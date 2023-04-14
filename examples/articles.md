@@ -6,6 +6,12 @@
   <!-- </DYNFIELD:ARTICLES_NUMBER> -->
 </h3>
 
+<p>
+<!-- <DYNFIELD:LAST_UPDATE_BY> -->
+javascript ts
+<!-- </DYNFIELD:LAST_UPDATE_BY> -->
+</p>
+
 <div align="center">
   <!-- <DYNFIELD:NODEJS_UTILITIES> -->
     <table>

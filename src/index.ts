@@ -1,24 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
 
+import type { RowContent, CellContent, DynamicField, SaveFileOptions } from './types';
+import { CellContentSchema, SaveFileOptionsSchema } from './types';
+
 const FIELD_PREFIX = 'DYNFIELD';
-
-type SaveFileOptions = { path?: string; overwrite?: boolean };
-
-type Alignment = 'center' | 'left' | 'right' | 'justify';
-
-type CellContent = {
-  content: string;
-  width?: number;
-  align?: Alignment;
-};
-
-type RowContent = CellContent[];
-
-type Field = {
-  fieldName: string;
-  fieldType: 'open' | 'close';
-};
 
 function getJson(jsonFile: string) {
   if (!existsSync(jsonFile)) {
@@ -31,11 +17,27 @@ class MarkdownTable {
   private headerMD = '';
   private headerItems: RowContent = [];
   private bodyItems: RowContent[] = [];
-  ERRORS = {
+  private cellContent: CellContent = {
+    content: 'cell content',
+    width: 200,
+    align: 'center'
+  };
+  private ERRORS = {
+    tableRowIsNotValid: `you provided a invalid table row object, the correct format is an array of the following object type:\n${JSON.stringify(this.cellContent)}`,
     columnNotFound: (column: string, allColumns: string) => `you must specify a valid column to join: [${column}] is not part of [${allColumns}]`
   };
 
+  private isValidTableRow(tableRow: RowContent) {
+    const onlyValidItems = tableRow.filter((boiler) => CellContentSchema.safeParse(boiler).success);
+    const isValidRow = tableRow.length === onlyValidItems.length;
+    return isValidRow;
+  }
+
   setHeader(header: RowContent) {
+    if (!this.isValidTableRow(header)) {
+      throw new Error(this.ERRORS.tableRowIsNotValid);
+    }
+
     let allHeaderRows = '';
 
     for (const col of header) {
@@ -46,6 +48,9 @@ class MarkdownTable {
   }
 
   addBodyRow(body: RowContent) {
+    if (!this.isValidTableRow(body)) {
+      throw new Error(this.ERRORS.tableRowIsNotValid);
+    }
     this.bodyItems.push(body);
   }
 
@@ -127,7 +132,7 @@ class DynMarkdown {
   private updatedFields: string[] = [];
   fields: string[] = [];
   markdownContent = '';
-  ERRORS = {
+  private ERRORS = {
     noFieldsFound: `no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`,
     fileDoesNotExist: (file: string) => `specified file [${file}] does not exist`,
     folderDoesNotExist: (folder: string) => `the specified path folder doesnt exists [${folder}]!`,
@@ -137,7 +142,8 @@ class DynMarkdown {
     overlapingFields: (field1: string, field2: string) => `fields [${field1}] and [${field2}] have errors, please make sure that the fields are open and closed sequentially.`,
     fieldNameWithSpaces: (field: string) => `a field should not have space in its name: ${field}`,
     missingField: (field: string, validFields: string) => `field [${field}] was not found in the file!\nthe current fields are: ${validFields}\n`,
-    mustSpecifyLineToSearch: `when using 'line_after' or 'line_before', you must specify a line to search`
+    mustSpecifyLineToSearch: `when using 'line_after' or 'line_before', you must specify a line to search`,
+    invalidSaveFileOptions: 'you must specify a valid options object to saveFile function'
   };
 
   constructor(private markdownPath: string) {
@@ -160,7 +166,7 @@ class DynMarkdown {
   private validateFields(fields: string[]) {
     const validFields: string[] = [];
 
-    const tmpFields: Field[] = fields.map((fieldStr: string) => {
+    const tmpFields: DynamicField[] = fields.map((fieldStr: string) => {
       const strWithoutCommentsReg = /<!-- ([^;]+) -->/.exec(fieldStr);
       const strWithoutCommentsStr = (strWithoutCommentsReg ? strWithoutCommentsReg[1] : '') ?? '';
       const fieldOpenReg = new RegExp(`<${FIELD_PREFIX}:([^;]+)>`).exec(strWithoutCommentsStr);
@@ -175,7 +181,7 @@ class DynMarkdown {
     });
 
     for (let x = 0; x < tmpFields.length; x++) {
-      const curField = tmpFields[x] as Field;
+      const curField = tmpFields[x] as DynamicField;
 
       if (x === 0) {
         continue;
@@ -363,6 +369,10 @@ class DynMarkdown {
   saveFile(options?: SaveFileOptions) {
     let finalPath = this.markdownPath;
 
+    if (options && !SaveFileOptionsSchema.safeParse(options).success) {
+      throw new Error(this.ERRORS.invalidSaveFileOptions);
+    }
+
     if (options?.path) {
       if (!options?.overwrite && existsSync(options.path)) {
         throw new Error(this.ERRORS.outputFileAlreadyExists(options.path));
@@ -377,6 +387,7 @@ class DynMarkdown {
 
     writeFileSync(finalPath, this.markdownContent);
     const updatedFields = this.updatedFields.length;
+
     if (updatedFields === 1) {
       console.log(`field ${this.updatedFields[0]} was updated in the [${basename(this.markdownPath)}]`);
     }
