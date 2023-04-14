@@ -3,7 +3,9 @@
 <div align="center">
   <a href="https://www.npmjs.com/package/dyn-markdown"><img src="https://img.shields.io/npm/v/dyn-markdown.svg?style=flat" alt="npm version"></a>
   <a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/made%20with-node-1f425f?logo=node.js&.svg" /></a>
-  <a href="https://github.com/lucasvtiradentes/dyn-markdown#contributing"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" alt="contributions" /></a>
+  <a href="https://github.com/lucasvtiradentes/dyn-markdown#contributing"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat" alt="contributions" /></a><br>
+  <a href="https://github.com/lucasvtiradentes/dyn-markdown/actions/workflows/ci-cd.yml"><img src="https://github.com/lucasvtiradentes/dyn-markdown/workflows/CI/badge.svg"/></a>
+  <a href="https://codecov.io/github/lucasvtiradentes/dyn-markdown"><img src="https://codecov.io/github/lucasvtiradentes/dyn-markdown/branch/master/graph/badge.svg?token=O9RMJ3XNG2"/></a>
 </div>
 
 <p align="center">
@@ -53,7 +55,7 @@ Easily handle dynamic fields in markdown files, such as quantity fields or even 
 
 <div align="center"><img src="./.github/images/demo.png"></div>
 
-In the <a href="#related">related section</a> you can see some projects using this project.
+In the <a href="#related">related section</a> and also in [dependents](https://github.com/lucasvtiradentes/dyn-markdown/network/dependents) you can see some projects using this package.
 
 ## :dart: Features<a href="#TOC"><img align="right" src="./.github/images/up_arrow.png" width="22"></a>
 

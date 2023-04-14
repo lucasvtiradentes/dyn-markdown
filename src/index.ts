@@ -135,7 +135,7 @@ class DynMarkdown {
   private ERRORS = {
     noFieldsFound: `no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`,
     fileDoesNotExist: (file: string) => `specified file [${file}] does not exist`,
-    folderDoesNotExist: (folder: string) => `the specified path folder doesnt exists [${folder}]!`,
+    folderDoesNotExist: (folder: string) => `the specified path folder doesnt exist [${folder}]!`,
     outputFileAlreadyExists: (file: string) => `the specified file already exists [${file}] and you didnt allow overwriting!`,
     fieldWithNoClosingTag: (field: string) => `every even field must be an ending one: ${field}`,
     fieldWithNoOpeningTag: (field: string) => `every odd field must be an opening one: ${field}`,
@@ -394,6 +394,8 @@ class DynMarkdown {
     if (updatedFields > 1) {
       console.log(`fields [${this.updatedFields.join(', ')}] were updated in the [${basename(this.markdownPath)}]`);
     }
+
+    return true;
   }
 }
 
