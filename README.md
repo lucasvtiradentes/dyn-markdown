@@ -212,7 +212,7 @@ After run the above typescript code, all the content will be replaced.
 
 ### Development setup
 
-If you want to make changes to the source code, it is recommended to also install the following items:
+If you want to [contribute](./docs/CONTRIBUTING.md) to the project it is recommended to also install the following tools:
 
 - [git](https://git-scm.com/): To work with version controlling;
 - [vscode](https://code.visualstudio.com/): Useful for editing the code. You can choose a similar editor as you wish.
@@ -233,11 +233,14 @@ $ npm install
 $ npm run dev
 ```
 
-If you want to contribute to the project, after you make the necessary changes, run these commands to check if everything is working fine:
+After you make the necessary changes, run these commands to check if everything is working fine:
 
 ```bash
 # Compiles the typescript code into javascript
 $ npm run build
+
+# Run the available unit tests
+$ npm run test
 
 # Run the compiled code in production mode
 $ npm run start
@@ -245,7 +248,7 @@ $ npm run start
 
 ### Used technologies
 
-dyn-markdown uses the following thechnologies:
+This project uses the following thechnologies:
 
 <div align="center">
   <table>
@@ -255,7 +258,7 @@ dyn-markdown uses the following thechnologies:
       <th>Technologies</th>
     </tr>
     <tr>
-      <td rowspan="1">Main</td>
+      <td rowspan="1">Project</td>
       <td>Main</td>
       <td align="center">
         <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white"></a>
@@ -298,8 +301,6 @@ dyn-markdown uses the following thechnologies:
 ## :books: About<a href="#TOC"><img align="right" src="./.github/images/up_arrow.png" width="22"></a>
 
 ## Related
-
-The most related links to this project are:
 
 - [js-boilerplates](https://github.com/lucasvtiradentes/js-boilerplates#readme): boilerplates repository that uses this package to update boilerplate lists;
 - [my-tutorials](https://github.com/lucasvtiradentes/my-tutorials#readme): my github tutorials repository that uses this package to update articles, projects and other stuff;

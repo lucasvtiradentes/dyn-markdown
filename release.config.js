@@ -72,7 +72,7 @@ module.exports = {
       '@semantic-release/git',
       {
         assets: ['docs/CHANGELOG.MD', 'package.json'],
-        message: ':memo: docs: update changelog files ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
+        message: ':bookmark: tags: new version release ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
       }
     ]
   ]
