@@ -1,5 +1,17 @@
 # CHANGELOG HISTORY
 
+## [1.3.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.2.0...v1.3.0) (2023-04-14)
+
+
+### ✨ feature:
+
+* add table row validation with zod ([#8](https://github.com/lucasvtiradentes/dyn-markdown/issues/8)) ([1dc95ca](https://github.com/lucasvtiradentes/dyn-markdown/commit/1dc95ca21eee8926ec8985690fc3eded7ba732e7))
+
+
+### ✅ tests:
+
+* add related coverage tests ([#10](https://github.com/lucasvtiradentes/dyn-markdown/issues/10)) ([d877062](https://github.com/lucasvtiradentes/dyn-markdown/commit/d8770620eae087868890bde7d34f8b1a7a9c0177))
+
 ## [1.2.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.1.0...v1.2.0) (2023-02-03)
 
 
