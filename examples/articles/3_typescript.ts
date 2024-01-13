@@ -1,4 +1,4 @@
-import { DynMarkdown, MarkdownTable, getJson, TRowContent } from '../src/index';
+import { DynMarkdown, MarkdownTable, getJson, TRowContent } from '../../src/index';
 
 type TArticleItem = {
   date: string;
@@ -8,8 +8,8 @@ type TArticleItem = {
 };
 
 type TArticleFields = 'LAST_UPDATE_BY' | 'NODEJS_UTILITIES' | 'ARTICLES_NUMBER';
-const articlesJson: TArticleItem[] = getJson('./examples/articles.json');
-const articlesMarkdown = new DynMarkdown<TArticleFields>('./examples/articles.md');
+const articlesJson: TArticleItem[] = getJson('./examples/articles/articles.json');
+const articlesMarkdown = new DynMarkdown<TArticleFields>('./examples/articles/articles.md');
 
 // TABLE =======================================================================
 

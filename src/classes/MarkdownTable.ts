@@ -4,41 +4,39 @@ import { cellContentSchema, TCellContent, TRowContent } from '../constants/schem
 type WithContent<T> = T extends { content: infer U } ? U : never;
 type ExtractContent<T extends readonly any[]> = { [K in keyof T]: WithContent<T[K]> };
 
+const ROW_TYPE = {
+  body: 'body',
+  header: 'header'
+} as const;
+
 export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellContent>> {
-  private headerMD = '';
-  private headerItems: TRowContent | TColumnItem = [];
-  private bodyItems: TRowContent[] = [];
+  #headerMD = '';
+  #headerItems: TColumnItem;
+  #bodyItems: TRowContent[] = [];
 
   constructor(header: TColumnItem) {
-    if (!this.isValidTableRow(header)) {
+    if (!this.#isValidTableRow(header)) {
       throw new Error(ERRORS.tableRowIsNotValid);
     }
 
     let allHeaderRows = '';
 
     for (const col of header) {
-      allHeaderRows = allHeaderRows + this.addRow(col, 'header') + '\n';
+      allHeaderRows = allHeaderRows + this.#addRow(col, ROW_TYPE.header) + '\n';
     }
-    this.headerItems = header;
-    this.headerMD = '  <tr>' + '\n' + allHeaderRows + '  </tr>';
+    this.#headerItems = header;
+    this.#headerMD = '  <tr>' + '\n' + allHeaderRows + '  </tr>';
   }
 
   // ===========================================================================
 
-  private isValidTableRow(tableRow: TRowContent | TColumnItem) {
+  #isValidTableRow(tableRow: TRowContent | TColumnItem) {
     const onlyValidItems = tableRow.filter((boiler) => cellContentSchema.safeParse(boiler).success);
     const isValidRow = tableRow.length === onlyValidItems.length;
     return isValidRow;
   }
 
-  addBodyRow(body: TRowContent) {
-    if (!this.isValidTableRow(body)) {
-      throw new Error(ERRORS.tableRowIsNotValid);
-    }
-    this.bodyItems.push(body);
-  }
-
-  private getBodyMd(allBody: TRowContent[], columnToJoinIndex?: number) {
+  #getBodyMd(allBody: TRowContent[], columnToJoinIndex?: number) {
     let allBodyMD = '';
     const uniqueItems: string[] = [];
 
@@ -50,12 +48,12 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
           if (!uniqueItems.includes(col.content)) {
             const qnt = allBody.map((item) => item[columnToJoinIndex]).filter((item) => item?.content === col.content).length;
             uniqueItems.push(col.content);
-            curRow = curRow + this.addRow(col, 'body', { quantity: qnt }) + '\n';
+            curRow = curRow + this.#addRow(col, ROW_TYPE.body, { quantity: qnt }) + '\n';
           } else {
-            curRow = curRow + this.addRow(col, 'body', { comment: true }) + '\n';
+            curRow = curRow + this.#addRow(col, ROW_TYPE.body, { comment: true }) + '\n';
           }
         } else {
-          curRow = curRow + this.addRow(col, 'body') + '\n';
+          curRow = curRow + this.#addRow(col, ROW_TYPE.body) + '\n';
         }
       });
 
@@ -66,31 +64,13 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
     return allBodyMD;
   }
 
-  getTable(columnToJoin?: ExtractContent<TColumnItem>[number]) {
-    let finalBody = '';
-
-    if (columnToJoin) {
-      const allColumns = this.headerItems.map((item) => item.content);
-      if (!allColumns.includes(columnToJoin)) {
-        throw new Error(ERRORS.columnNotFound(columnToJoin, allColumns.join(', ')));
-      }
-
-      const columnIndex = this.headerItems.findIndex((item) => item.content === columnToJoin);
-      finalBody = this.getBodyMd(this.bodyItems, columnIndex);
-    } else {
-      finalBody = this.getBodyMd(this.bodyItems);
-    }
-
-    const markdownTable = '<table>' + '\n' + this.headerMD + '\n' + finalBody + '\n' + '</table>';
-    return markdownTable;
-  }
-
-  private addRow(col: TCellContent, type: 'header' | 'body', options?: { quantity?: number; comment?: true }) {
+  #addRow(col: TCellContent, type: keyof typeof ROW_TYPE, options?: { quantity?: number; comment?: true }) {
     const { content, width, align } = col;
-    const rowType = type === 'header' ? 'th' : 'td';
+    const rowType = type === ROW_TYPE.header ? 'th' : 'td';
 
     let row = '';
-    row = `    <${rowType}>${content}</${rowType}>`;
+    const spacing = '    ';
+    row = (options?.comment ? '' : spacing) + `<${rowType}>${content}</${rowType}>`;
 
     if (width) {
       row = row.replace(`<${rowType}`, `<${rowType} width="${width}"`);
@@ -105,9 +85,37 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
     }
 
     if (options?.comment) {
-      row = `<!-- ${row} -->`;
+      row = `${spacing}<!-- ${row} -->`;
     }
 
     return row;
+  }
+
+  // ===========================================================================
+
+  addBodyRow(body: TRowContent) {
+    if (!this.#isValidTableRow(body)) {
+      throw new Error(ERRORS.tableRowIsNotValid);
+    }
+    this.#bodyItems.push(body);
+  }
+
+  getTable(columnToJoin?: ExtractContent<TColumnItem>[number]) {
+    let finalBody = '';
+
+    if (columnToJoin) {
+      const allColumns = this.#headerItems.map((item) => item.content);
+      if (!allColumns.includes(columnToJoin)) {
+        throw new Error(ERRORS.columnNotFound(columnToJoin, allColumns.join(', ')));
+      }
+
+      const columnIndex = this.#headerItems.findIndex((item) => item.content === columnToJoin);
+      finalBody = this.#getBodyMd(this.#bodyItems, columnIndex);
+    } else {
+      finalBody = this.#getBodyMd(this.#bodyItems);
+    }
+
+    const markdownTable = '<table>' + '\n' + this.#headerMD + '\n' + finalBody + '\n' + '</table>';
+    return markdownTable;
   }
 }

@@ -1,0 +1,146 @@
+[
+  {
+    "category": "habits",
+    "name": "Alarmy",
+    "link": "https://play.google.com/store/apps/details?id=droom.sleepIfUCan",
+    "description": "Alarme com tarefas para poder desligar"
+  },
+  {
+    "category": "habits",
+    "name": "Sleep Timer",
+    "link": "https://sleep-timer-sleepy-technologies.en.aptoide.com/app",
+    "description": "Programar o celular para desligar"
+  },
+  {
+    "category": "habits",
+    "name": "AppBlock",
+    "link": "https://play.google.com/store/apps/details?id=cz.mobilesoft.appblock",
+    "description": "Bloquear aplicativos e páginas da internet"
+  },
+  {
+    "category": "habits",
+    "name": "Minimalist Phone Launcher",
+    "link": "https://play.google.com/store/apps/details?id=com.qqlabs.minimalistlauncher",
+    "description": "Launcher minimalista para deixar o celular mais chato"
+  },
+  {
+    "category": "productivity",
+    "name": "Google Agenda",
+    "link": "https://play.google.com/store/apps/details?id=com.google.android.calendar",
+    "description": "-"
+  },
+  {
+    "category": "productivity",
+    "name": "TickTick",
+    "link": "https://play.google.com/store/apps/details?id=com.ticktick.task",
+    "description": "-"
+  },
+  {
+    "category": "productivity",
+    "name": "RescueTime Classic",
+    "link": "https://play.google.com/store/apps/details?id=com.rescuetime.android",
+    "description": "Analisar o tempo gasto no celular"
+  },
+  {
+    "category": "finances",
+    "name": "Nubank",
+    "link": "https://play.google.com/store/apps/details?id=com.nu.production",
+    "description": "-"
+  },
+  {
+    "category": "finances",
+    "name": "XP investimentos",
+    "link": "https://play.google.com/store/apps/details?id=br.com.xp.carteira",
+    "description": "-"
+  },
+  {
+    "category": "communication",
+    "name": "Whatsapp",
+    "link": "https://play.google.com/store/apps/details?id=com.whatsapp",
+    "description": "-"
+  },
+  {
+    "category": "communication",
+    "name": "Discord",
+    "link": "https://play.google.com/store/apps/details?id=com.discord",
+    "description": "-"
+  },
+  {
+    "category": "fun",
+    "name": "Spotify",
+    "link": "https://play.google.com/store/apps/details?id=com.spotify.music",
+    "description": "-"
+  },
+  {
+    "category": "fun",
+    "name": "Twitch",
+    "link": "https://play.google.com/store/apps/details?id=tv.twitch.android.app",
+    "description": "-"
+  },
+  {
+    "category": "fun",
+    "name": "PPSSPP",
+    "link": "https://play.google.com/store/apps/details?id=org.ppsspp.ppsspp",
+    "description": "Emular PSP"
+  },
+  {
+    "category": "fun",
+    "name": "Snes9x EX+",
+    "link": "https://play.google.com/store/apps/details?id=com.explusalpha.Snes9xPlus",
+    "description": "Emular Nitendo 64"
+  },
+  {
+    "category": "fun",
+    "name": "AetherSX2",
+    "link": "https://play.google.com/store/apps/details?id=xyz.aethersx2.android",
+    "description": "Emular PS2"
+  },
+  {
+    "category": "devops",
+    "name": "LG ThinQ",
+    "link": "https://play.google.com/store/apps/details?id=com.lgeha.nuts",
+    "description": "Controlar TV do quarto pelo celular"
+  },
+  {
+    "category": "devops",
+    "name": "Syncthing",
+    "link": "https://play.google.com/store/apps/details?id=com.nutomic.syncthingandroid",
+    "description": "Sincronizar arquivos entre android e linux"
+  },
+  {
+    "category": "devops",
+    "name": "KDE Connect",
+    "link": "https://play.google.com/store/apps/details?id=org.kde.kdeconnect_tp",
+    "description": "Controlar o linux pelo celular"
+  },
+  {
+    "category": "devops",
+    "name": "AudioRelay",
+    "link": "https://play.google.com/store/apps/details?id=com.azefsw.audioconnect",
+    "description": "Transformar o celular em um microfone do linux"
+  },
+  {
+    "category": "auth",
+    "name": "Google Authenticator",
+    "link": "https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2",
+    "description": "-"
+  },
+  {
+    "category": "auth",
+    "name": "Microsoft Authenticator",
+    "link": "https://play.google.com/store/apps/details?id=com.azure.authenticator",
+    "description": "-"
+  },
+  {
+    "category": "auth",
+    "name": "Authy",
+    "link": "https://play.google.com/store/apps/details?id=com.authy.authy",
+    "description": "-"
+  },
+  {
+    "category": "dev",
+    "name": "Github",
+    "link": "https://play.google.com/store/apps/details?id=com.github.android",
+    "description": "-"
+  }
+]

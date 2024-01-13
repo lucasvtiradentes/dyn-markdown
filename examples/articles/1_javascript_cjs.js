@@ -1,7 +1,9 @@
-import { DynMarkdown, MarkdownTable, getJson } from '../dist/index.mjs';
+/* eslint-disable @typescript-eslint/no-var-requires */
 
-const articlesJson = getJson('./examples/articles.json');
-const articlesMarkdown = new DynMarkdown('./examples/articles.md');
+const { DynMarkdown, MarkdownTable, getJson } = require('../../dist/index.js');
+
+const articlesJson = getJson('./examples/articles/articles.json');
+const articlesMarkdown = new DynMarkdown('./examples/articles/articles.md');
 
 const articlesTable = new MarkdownTable();
 
@@ -25,7 +27,7 @@ articlesJson.forEach((item) => {
   articlesTable.addBodyRow(bodyRow);
 });
 
-articlesMarkdown.updateField('LAST_UPDATE_BY', 'javascript esm');
+articlesMarkdown.updateField('LAST_UPDATE_BY', 'javascript cjs');
 articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
 articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
 articlesMarkdown.saveFile();

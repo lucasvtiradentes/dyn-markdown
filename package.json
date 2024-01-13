@@ -30,9 +30,10 @@
     "pub:check": "npm publish --dry-run",
     "commit": "cz",
     "lint:staged": "lint-staged --concurrent false --quiet",
-    "example:js_cjs": "node ./examples/1_javascript_cjs.js",
-    "example:js_esm": "node ./examples/2_javascript_esm.mjs",
-    "example:ts": "tsx ./examples/3_typescript.ts"
+    "example:js_cjs": "node ./examples/articles/1_javascript_cjs.js",
+    "example:js_esm": "node ./examples/articles/2_javascript_esm.mjs",
+    "example:ts": "tsx ./examples/articles/3_typescript.ts",
+    "example:ts2": "tsx ./examples/android/index.ts"
   },
   "dependencies": {
     "zod": "^3.22.4"
