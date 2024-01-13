@@ -1,5 +1,21 @@
 # CHANGELOG HISTORY
 
+## [1.4.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.3.1...v1.4.0) (2024-01-13)
+
+
+### ✨ feature:
+
+* add better generic types ([9e2e97d](https://github.com/lucasvtiradentes/dyn-markdown/commit/9e2e97d1ee0dea7e7080438f8522fd37cd8c71c2))
+* add list markdown items by line start pattern ([d05f105](https://github.com/lucasvtiradentes/dyn-markdown/commit/d05f105eb08c3112407c4ee197a9b57b1d8b81ca))
+* export row type ([dd7e569](https://github.com/lucasvtiradentes/dyn-markdown/commit/dd7e569166bdf07d8d6ed7f8f81a56eafec9d165))
+* update schemas names ([9fdd466](https://github.com/lucasvtiradentes/dyn-markdown/commit/9fdd4669c3821128643cc8f22daefaadee463278))
+
+
+### 🐛 bugfix:
+
+* merge table column error ([78e83cd](https://github.com/lucasvtiradentes/dyn-markdown/commit/78e83cd79a2f128034bcc36344ef84918eeba3cd))
+* tests errors ([9791c0e](https://github.com/lucasvtiradentes/dyn-markdown/commit/9791c0e8d86d5310b6cc58eaa1ed00eae1277866))
+
 ## [1.3.1](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.3.0...v1.3.1) (2023-04-14)
 
 ## [1.3.0](https://github.com/lucasvtiradentes/dyn-markdown/compare/v1.2.0...v1.3.0) (2023-04-14)
