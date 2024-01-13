@@ -1,21 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
-import { FIELD_PREFIX } from '../constants/configs';
-import { TDynamicField, TSaveFileOptions, saveFileOptionsSchema } from '../constants/schemas';
-
-const MAKRDOWN_ERRORS = {
-  noFieldsFound: `no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`,
-  fileDoesNotExist: (file: string) => `specified file [${file}] does not exist`,
-  folderDoesNotExist: (folder: string) => `the specified path folder doesnt exist [${folder}]!`,
-  outputFileAlreadyExists: (file: string) => `the specified file already exists [${file}] and you didnt allow overwriting!`,
-  fieldWithNoClosingTag: (field: string) => `every even field must be an ending one: ${field}`,
-  fieldWithNoOpeningTag: (field: string) => `every odd field must be an opening one: ${field}`,
-  overlapingFields: (field1: string, field2: string) => `fields [${field1}] and [${field2}] have errors, please make sure that the fields are open and closed sequentially.`,
-  fieldNameWithSpaces: (field: string) => `a field should not have space in its name: ${field}`,
-  missingField: (field: string, validFields: string) => `field [${field}] was not found in the file!\nthe current fields are: ${validFields}\n`,
-  mustSpecifyLineToSearch: `when using 'line_after' or 'line_before', you must specify a line to search`,
-  TinvalidSaveFileOptions: 'you must specify a valid options object to saveFile function'
-};
+import { CONFIGS } from '../constants/configs';
+import { ERRORS } from '../constants/errors';
+import { FILE_STATUS, TDynamicField, TSaveFileOptions, saveFileOptionsSchema } from '../constants/schemas';
 
 export default class DynMarkdown<TFields extends string> {
   private updatedFields: string[] = [];
@@ -24,7 +11,7 @@ export default class DynMarkdown<TFields extends string> {
 
   constructor(private markdownPath: string) {
     if (!existsSync(markdownPath)) {
-      throw new Error(MAKRDOWN_ERRORS.fileDoesNotExist(markdownPath));
+      throw new Error(ERRORS.fileDoesNotExist(markdownPath));
     }
 
     this.markdownPath = markdownPath;
@@ -34,7 +21,7 @@ export default class DynMarkdown<TFields extends string> {
 
   private getFields(mdContent: string) {
     const mdByLines = mdContent.split('\n');
-    const fields = mdByLines.reduce((acc: string[], cur: string) => (cur.search(`${FIELD_PREFIX}:`) > -1 ? [...acc, cur] : acc), [] as string[]);
+    const fields = mdByLines.reduce((acc: string[], cur: string) => (cur.search(`${CONFIGS.FIELD_PREFIX}:`) > -1 ? [...acc, cur] : acc), [] as string[]);
     const validatedFields = this.validateFields(fields);
     return validatedFields as TFields[];
   }
@@ -45,14 +32,14 @@ export default class DynMarkdown<TFields extends string> {
     const tmpFields: TDynamicField[] = fields.map((fieldStr: string) => {
       const strWithoutCommentsReg = /<!-- ([^;]+) -->/.exec(fieldStr);
       const strWithoutCommentsStr = (strWithoutCommentsReg ? strWithoutCommentsReg[1] : '') ?? '';
-      const fieldOpenReg = new RegExp(`<${FIELD_PREFIX}:([^;]+)>`).exec(strWithoutCommentsStr);
+      const fieldOpenReg = new RegExp(`<${CONFIGS.FIELD_PREFIX}:([^;]+)>`).exec(strWithoutCommentsStr);
       const fieldOpenStr = fieldOpenReg ? fieldOpenReg[1] : '';
-      const fieldCloseReg = new RegExp(`</${FIELD_PREFIX}:([^;]+)>`).exec(strWithoutCommentsStr);
+      const fieldCloseReg = new RegExp(`</${CONFIGS.FIELD_PREFIX}:([^;]+)>`).exec(strWithoutCommentsStr);
       const fieldCloseStr = (fieldCloseReg ? fieldCloseReg[1] : '') ?? '';
 
       return {
         fieldName: fieldOpenStr ? fieldOpenStr : fieldCloseStr,
-        fieldType: fieldOpenStr ? 'open' : 'close'
+        fieldType: fieldOpenStr ? FILE_STATUS.open : FILE_STATUS.close
       };
     });
 
@@ -64,16 +51,16 @@ export default class DynMarkdown<TFields extends string> {
       }
 
       if (x % 2 === 0) {
-        if (curField.fieldType === 'close') {
-          throw new Error(MAKRDOWN_ERRORS.fieldWithNoClosingTag(curField.fieldName));
+        if (curField.fieldType === FILE_STATUS.close) {
+          throw new Error(ERRORS.fieldWithNoClosingTag(curField.fieldName));
         }
       } else {
-        if (curField.fieldType === 'open') {
-          throw new Error(MAKRDOWN_ERRORS.fieldWithNoOpeningTag(curField.fieldName));
+        if (curField.fieldType === FILE_STATUS.open) {
+          throw new Error(ERRORS.fieldWithNoOpeningTag(curField.fieldName));
         }
 
         if (curField.fieldName !== tmpFields[x - 1]?.fieldName) {
-          throw new Error(MAKRDOWN_ERRORS.overlapingFields(curField.fieldName, tmpFields[x - 1]?.fieldName));
+          throw new Error(ERRORS.overlapingFields(curField.fieldName, tmpFields[x - 1]?.fieldName));
         }
 
         validFields.push(curField.fieldName);
@@ -81,12 +68,12 @@ export default class DynMarkdown<TFields extends string> {
     }
 
     if (validFields.length === 0) {
-      throw new Error(MAKRDOWN_ERRORS.noFieldsFound);
+      throw new Error(ERRORS.noFieldsFound);
     }
 
     validFields.forEach((field) => {
       if (field.search(' ') > -1) {
-        throw new Error(MAKRDOWN_ERRORS.fieldNameWithSpaces(field));
+        throw new Error(ERRORS.fieldNameWithSpaces(field));
       }
     });
 
@@ -97,11 +84,11 @@ export default class DynMarkdown<TFields extends string> {
 
   updateField(fieldToupdate: TFields, newContent: string) {
     if (!this.fields.includes(fieldToupdate)) {
-      throw new Error(MAKRDOWN_ERRORS.missingField(fieldToupdate, this.fields.join(', ')));
+      throw new Error(ERRORS.missingField(fieldToupdate, this.fields.join(', ')));
     }
 
     const contentSplitedArr = this.markdownContent.split(/\r?\n/);
-    const searchString = `${FIELD_PREFIX}:${fieldToupdate}`;
+    const searchString = `${CONFIGS.FIELD_PREFIX}:${fieldToupdate}`;
 
     let initialRow = NaN;
     let finalRow = NaN;
@@ -146,11 +133,11 @@ export default class DynMarkdown<TFields extends string> {
 
   deleteField(field: TFields) {
     if (!this.fields.includes(field)) {
-      throw new Error(MAKRDOWN_ERRORS.missingField(field, this.fields.join(', ')));
+      throw new Error(ERRORS.missingField(field, this.fields.join(', ')));
     }
 
     const contentSplitedArr = this.markdownContent.split(/\r?\n/);
-    const searchString = `${FIELD_PREFIX}:${field}`;
+    const searchString = `${CONFIGS.FIELD_PREFIX}:${field}`;
 
     let initialRow = NaN;
     let finalRow = NaN;
@@ -185,7 +172,7 @@ export default class DynMarkdown<TFields extends string> {
 
   addSection(content: string, position: 'begin' | 'end' | 'line_after' | 'line_before', searchedLine?: string) {
     if (position.search('line') > -1 && !searchedLine) {
-      throw new Error(MAKRDOWN_ERRORS.mustSpecifyLineToSearch);
+      throw new Error(ERRORS.mustSpecifyLineToSearch);
     }
 
     const contentSplitedArr = this.markdownContent.split(/\r?\n/);
@@ -246,16 +233,16 @@ export default class DynMarkdown<TFields extends string> {
     let finalPath = this.markdownPath;
 
     if (options && !saveFileOptionsSchema.safeParse(options).success) {
-      throw new Error(MAKRDOWN_ERRORS.TinvalidSaveFileOptions);
+      throw new Error(ERRORS.TinvalidSaveFileOptions);
     }
 
     if (options?.path) {
       if (!options?.overwrite && existsSync(options.path)) {
-        throw new Error(MAKRDOWN_ERRORS.outputFileAlreadyExists(options.path));
+        throw new Error(ERRORS.outputFileAlreadyExists(options.path));
       }
 
       if (!dirname(options.path)) {
-        throw new Error(MAKRDOWN_ERRORS.folderDoesNotExist(options.path));
+        throw new Error(ERRORS.folderDoesNotExist(options.path));
       }
 
       finalPath = options.path;

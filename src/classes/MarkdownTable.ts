@@ -1,15 +1,5 @@
+import { ERRORS } from '../constants/errors';
 import { cellContentSchema, TCellContent, TRowContent } from '../constants/schemas';
-
-const cellContent: TCellContent = {
-  content: 'cell content',
-  width: 200,
-  align: 'center'
-};
-
-const TABLE_ERRORS = {
-  tableRowIsNotValid: `you provided a invalid table row object, the correct format is an array of the following object type:\n${JSON.stringify(cellContent)}`,
-  columnNotFound: (column: string, allColumns: string) => `you must specify a valid column to join: [${column}] is not part of [${allColumns}]`
-};
 
 type WithContent<T> = T extends { content: infer U } ? U : never;
 type ExtractContent<T extends readonly any[]> = { [K in keyof T]: WithContent<T[K]> };
@@ -21,7 +11,7 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
 
   constructor(header: TColumnItem) {
     if (!this.isValidTableRow(header)) {
-      throw new Error(TABLE_ERRORS.tableRowIsNotValid);
+      throw new Error(ERRORS.tableRowIsNotValid);
     }
 
     let allHeaderRows = '';
@@ -43,7 +33,7 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
 
   addBodyRow(body: TRowContent) {
     if (!this.isValidTableRow(body)) {
-      throw new Error(TABLE_ERRORS.tableRowIsNotValid);
+      throw new Error(ERRORS.tableRowIsNotValid);
     }
     this.bodyItems.push(body);
   }
@@ -82,7 +72,7 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
     if (columnToJoin) {
       const allColumns = this.headerItems.map((item) => item.content);
       if (!allColumns.includes(columnToJoin)) {
-        throw new Error(TABLE_ERRORS.columnNotFound(columnToJoin, allColumns.join(', ')));
+        throw new Error(ERRORS.columnNotFound(columnToJoin, allColumns.join(', ')));
       }
 
       const columnIndex = this.headerItems.findIndex((item) => item.content === columnToJoin);

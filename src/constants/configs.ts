@@ -1,1 +1,4 @@
-export const FIELD_PREFIX = 'DYNFIELD';
+export const CONFIGS = {
+  FIELD_PREFIX: 'DYNFIELD',
+  TAB_SPACING: 2
+};
