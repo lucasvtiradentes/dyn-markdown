@@ -1,33 +1,27 @@
 import z from 'zod';
 
-const SaveFileOptionsSchema = z
-  .object({
-    path: z.string().optional(),
-    overwrite: z.boolean().optional()
-  })
-  .strict();
+const saveFileOptionsSchema = z.object({
+  path: z.string().optional(),
+  overwrite: z.boolean().optional()
+});
 
-type SaveFileOptions = z.infer<typeof SaveFileOptionsSchema>;
+type TSaveFileOptions = z.infer<typeof saveFileOptionsSchema>;
 
-const DynamicFieldSchema = z
-  .object({
-    fieldName: z.string(),
-    fieldType: z.union([z.literal('open'), z.literal('close')])
-  })
-  .strict();
+const dynamicFieldSchema = z.object({
+  fieldName: z.string(),
+  fieldType: z.union([z.literal('open'), z.literal('close')])
+});
 
-type DynamicField = z.infer<typeof DynamicFieldSchema>;
+type TDynamicField = z.infer<typeof dynamicFieldSchema>;
 
-const CellContentSchema = z
-  .object({
-    content: z.string(),
-    width: z.number().optional(),
-    align: z.union([z.literal('center'), z.literal('left'), z.literal('right'), z.literal('justify')]).optional()
-  })
-  .strict();
+const cellContentSchema = z.object({
+  content: z.string(),
+  width: z.number().optional(),
+  align: z.union([z.literal('center'), z.literal('left'), z.literal('right'), z.literal('justify')]).optional()
+});
 
-type CellContent = z.infer<typeof CellContentSchema>;
+type TCellContent = z.infer<typeof cellContentSchema>;
 
-type RowContent = CellContent[];
+type TRowContent = TCellContent[];
 
-export { SaveFileOptionsSchema, SaveFileOptions, DynamicField, CellContentSchema, CellContent, RowContent };
+export { TCellContent, TDynamicField, TRowContent, TSaveFileOptions, cellContentSchema, saveFileOptionsSchema };

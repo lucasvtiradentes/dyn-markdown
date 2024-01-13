@@ -1,7 +1,6 @@
-import type { CellContent, RowContent } from '../constants/schemas';
-import { CellContentSchema } from '../constants/schemas';
+import { cellContentSchema, TCellContent, TRowContent } from '../constants/schemas';
 
-const cellContent: CellContent = {
+const cellContent: TCellContent = {
   content: 'cell content',
   width: 200,
   align: 'center'
@@ -14,16 +13,16 @@ const TABLE_ERRORS = {
 
 export default class MarkdownTable {
   private headerMD = '';
-  private headerItems: RowContent = [];
-  private bodyItems: RowContent[] = [];
+  private headerItems: TRowContent = [];
+  private bodyItems: TRowContent[] = [];
 
-  private isValidTableRow(tableRow: RowContent) {
-    const onlyValidItems = tableRow.filter((boiler) => CellContentSchema.safeParse(boiler).success);
+  private isValidTableRow(tableRow: TRowContent) {
+    const onlyValidItems = tableRow.filter((boiler) => cellContentSchema.safeParse(boiler).success);
     const isValidRow = tableRow.length === onlyValidItems.length;
     return isValidRow;
   }
 
-  setHeader(header: RowContent) {
+  setHeader(header: TRowContent) {
     if (!this.isValidTableRow(header)) {
       throw new Error(TABLE_ERRORS.tableRowIsNotValid);
     }
@@ -37,14 +36,14 @@ export default class MarkdownTable {
     this.headerMD = '  <tr>' + '\n' + allHeaderRows + '  </tr>';
   }
 
-  addBodyRow(body: RowContent) {
+  addBodyRow(body: TRowContent) {
     if (!this.isValidTableRow(body)) {
       throw new Error(TABLE_ERRORS.tableRowIsNotValid);
     }
     this.bodyItems.push(body);
   }
 
-  private getBodyMd(allBody: RowContent[], columnToJoinIndex?: number) {
+  private getBodyMd(allBody: TRowContent[], columnToJoinIndex?: number) {
     let allBodyMD = '';
     const uniqueItems: string[] = [];
 
@@ -91,7 +90,7 @@ export default class MarkdownTable {
     return markdownTable;
   }
 
-  private addRow(col: CellContent, type: 'header' | 'body', options?: { quantity?: number; comment?: true }) {
+  private addRow(col: TCellContent, type: 'header' | 'body', options?: { quantity?: number; comment?: true }) {
     const { content, width, align } = col;
     const rowType = type === 'header' ? 'th' : 'td';
 

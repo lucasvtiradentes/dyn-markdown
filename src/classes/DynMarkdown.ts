@@ -1,9 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname } from 'node:path';
-
 import { FIELD_PREFIX } from '../constants/configs';
-import type { DynamicField, SaveFileOptions } from '../constants/schemas';
-import { SaveFileOptionsSchema } from '../constants/schemas';
+import { TDynamicField, TSaveFileOptions, saveFileOptionsSchema } from '../constants/schemas';
 
 const MAKRDOWN_ERRORS = {
   noFieldsFound: `no dynamic field was found, add at least one before using: <${FIELD_PREFIX}:NAME>[content]</${FIELD_PREFIX}:NAME>`,
@@ -16,7 +14,7 @@ const MAKRDOWN_ERRORS = {
   fieldNameWithSpaces: (field: string) => `a field should not have space in its name: ${field}`,
   missingField: (field: string, validFields: string) => `field [${field}] was not found in the file!\nthe current fields are: ${validFields}\n`,
   mustSpecifyLineToSearch: `when using 'line_after' or 'line_before', you must specify a line to search`,
-  invalidSaveFileOptions: 'you must specify a valid options object to saveFile function'
+  TinvalidSaveFileOptions: 'you must specify a valid options object to saveFile function'
 };
 
 export default class DynMarkdown {
@@ -44,7 +42,7 @@ export default class DynMarkdown {
   private validateFields(fields: string[]) {
     const validFields: string[] = [];
 
-    const tmpFields: DynamicField[] = fields.map((fieldStr: string) => {
+    const tmpFields: TDynamicField[] = fields.map((fieldStr: string) => {
       const strWithoutCommentsReg = /<!-- ([^;]+) -->/.exec(fieldStr);
       const strWithoutCommentsStr = (strWithoutCommentsReg ? strWithoutCommentsReg[1] : '') ?? '';
       const fieldOpenReg = new RegExp(`<${FIELD_PREFIX}:([^;]+)>`).exec(strWithoutCommentsStr);
@@ -59,7 +57,7 @@ export default class DynMarkdown {
     });
 
     for (let x = 0; x < tmpFields.length; x++) {
-      const curField = tmpFields[x] as DynamicField;
+      const curField = tmpFields[x] as TDynamicField;
 
       if (x === 0) {
         continue;
@@ -244,11 +242,11 @@ export default class DynMarkdown {
 
   /* ======================================================================== */
 
-  saveFile(options?: SaveFileOptions) {
+  saveFile(options?: TSaveFileOptions) {
     let finalPath = this.markdownPath;
 
-    if (options && !SaveFileOptionsSchema.safeParse(options).success) {
-      throw new Error(MAKRDOWN_ERRORS.invalidSaveFileOptions);
+    if (options && !saveFileOptionsSchema.safeParse(options).success) {
+      throw new Error(MAKRDOWN_ERRORS.TinvalidSaveFileOptions);
     }
 
     if (options?.path) {
