@@ -1,24 +1,29 @@
-import { DynMarkdown, MarkdownTable, getJson } from '../src/index';
+import { DynMarkdown, MarkdownTable, getJson, TRowContent } from '../src/index';
 
-type RowContent = MarkdownTable['cellContent'][];
+type TArticleItem = {
+  date: string;
+  title: string;
+  motivation: string;
+  tech: string[];
+};
 
-const articlesJson = getJson('./examples/articles.json');
+const articlesJson: TArticleItem[] = getJson('./examples/articles.json');
 const articlesMarkdown = new DynMarkdown('./examples/articles.md');
 
-const articlesTable = new MarkdownTable();
+// TABLE =======================================================================
 
-const headerContent: RowContent = [
+const articlesTable = new MarkdownTable();
+const headerContent: TRowContent = [
   { content: 'date', width: 120 },
   { content: 'title', width: 600 },
   { content: 'motivation', width: 300 },
   { content: 'tech', width: 100 }
 ];
-
 articlesTable.setHeader(headerContent);
 
-articlesJson.forEach((item: any) => {
-  const { date, title, motivation, tech } = item;
-  const bodyRow: RowContent = [
+articlesJson.forEach((article) => {
+  const { date, title, motivation, tech } = article;
+  const bodyRow: TRowContent = [
     { content: date, align: 'center' },
     { content: title, align: 'center' },
     { content: motivation, align: 'left' },
@@ -26,6 +31,8 @@ articlesJson.forEach((item: any) => {
   ];
   articlesTable.addBodyRow(bodyRow);
 });
+
+// =============================================================================
 
 articlesMarkdown.updateField('LAST_UPDATE_BY', 'javascript ts');
 articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
