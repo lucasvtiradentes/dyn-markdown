@@ -1,7 +1,5 @@
-import { DynMarkdown, MarkdownTable, getJson } from '../src/index';
+import { DynMarkdown, MarkdownTable, getJson, TRowContent } from '../src/index';
 import { unlinkSync } from 'node:fs';
-
-type RowContent = MarkdownTable['cellContent'][];
 
 it('should give an error on open an nonexistent markdown file', () => {
   const nonExistentMarkdownFile = './tests/nonexistent.md';
@@ -28,8 +26,7 @@ it('should give an error on updating nonexistent field in the markdown file', ()
 
 it('should give an error on adding a table with a incorrect row format', () => {
   expect(() => {
-    const table = new MarkdownTable();
-    const tableRow = [
+    new MarkdownTable([
       {
         content: 'header column A',
         align: 'center'
@@ -38,9 +35,7 @@ it('should give an error on adding a table with a incorrect row format', () => {
         wrongContent: 'header column B',
         wrongAlign: 'center'
       }
-    ] as any;
-
-    table.setHeader(tableRow);
+    ] as any);
   }).toThrow(`you provided a invalid table row object, the correct format is an array of the following object type:\n{"content":"cell content","width":200,"align":"center"}`);
 });
 
@@ -64,22 +59,18 @@ it('should throw on overwrite a markdown file without permission', () => {
 
 it('should read a json and update a markdown table field correctly', () => {
   const newFile = './tests/newFile.md';
-  const articlesJson = getJson('./examples/articles.json');
+  const articlesJson = getJson('./examples/articles/articles.json');
   const exampleMarkdown = new DynMarkdown('./tests/example.md');
-  const articlesTable = new MarkdownTable();
-
-  const headerContent = [
+  const articlesTable = new MarkdownTable([
     { content: 'date', width: 120 },
     { content: 'title', width: 600 },
     { content: 'motivation', width: 300 },
     { content: 'tech', width: 100 }
-  ];
-
-  articlesTable.setHeader(headerContent);
+  ] as const);
 
   articlesJson.forEach((item: any) => {
     const { date, title, motivation, tech } = item;
-    const bodyRow: RowContent = [
+    const bodyRow: TRowContent = [
       { content: date, align: 'center' },
       { content: title, align: 'center' },
       { content: motivation, align: 'left' },
