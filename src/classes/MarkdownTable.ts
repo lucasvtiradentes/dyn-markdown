@@ -11,18 +11,15 @@ const TABLE_ERRORS = {
   columnNotFound: (column: string, allColumns: string) => `you must specify a valid column to join: [${column}] is not part of [${allColumns}]`
 };
 
-export default class MarkdownTable {
+type WithContent<T> = T extends { content: infer U } ? U : never;
+type ExtractContent<T extends readonly any[]> = { [K in keyof T]: WithContent<T[K]> };
+
+export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellContent>> {
   private headerMD = '';
-  private headerItems: TRowContent = [];
+  private headerItems: TRowContent | TColumnItem = [];
   private bodyItems: TRowContent[] = [];
 
-  private isValidTableRow(tableRow: TRowContent) {
-    const onlyValidItems = tableRow.filter((boiler) => cellContentSchema.safeParse(boiler).success);
-    const isValidRow = tableRow.length === onlyValidItems.length;
-    return isValidRow;
-  }
-
-  setHeader(header: TRowContent) {
+  constructor(header: TColumnItem) {
     if (!this.isValidTableRow(header)) {
       throw new Error(TABLE_ERRORS.tableRowIsNotValid);
     }
@@ -34,6 +31,14 @@ export default class MarkdownTable {
     }
     this.headerItems = header;
     this.headerMD = '  <tr>' + '\n' + allHeaderRows + '  </tr>';
+  }
+
+  // ===========================================================================
+
+  private isValidTableRow(tableRow: TRowContent | TColumnItem) {
+    const onlyValidItems = tableRow.filter((boiler) => cellContentSchema.safeParse(boiler).success);
+    const isValidRow = tableRow.length === onlyValidItems.length;
+    return isValidRow;
   }
 
   addBodyRow(body: TRowContent) {
@@ -71,7 +76,7 @@ export default class MarkdownTable {
     return allBodyMD;
   }
 
-  getTable(columnToJoin?: string) {
+  getTable(columnToJoin?: ExtractContent<TColumnItem>[number]) {
     let finalBody = '';
 
     if (columnToJoin) {

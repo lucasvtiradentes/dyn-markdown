@@ -7,19 +7,20 @@ type TArticleItem = {
   tech: string[];
 };
 
+type TArticleFields = 'LAST_UPDATE_BY' | 'NODEJS_UTILITIES' | 'ARTICLES_NUMBER';
 const articlesJson: TArticleItem[] = getJson('./examples/articles.json');
-const articlesMarkdown = new DynMarkdown('./examples/articles.md');
+const articlesMarkdown = new DynMarkdown<TArticleFields>('./examples/articles.md');
 
 // TABLE =======================================================================
 
-const articlesTable = new MarkdownTable();
-const headerContent: TRowContent = [
+const headerContent = [
   { content: 'date', width: 120 },
   { content: 'title', width: 600 },
   { content: 'motivation', width: 300 },
   { content: 'tech', width: 100 }
-];
-articlesTable.setHeader(headerContent);
+] as const satisfies TRowContent;
+
+const articlesTable = new MarkdownTable(headerContent);
 
 articlesJson.forEach((article) => {
   const { date, title, motivation, tech } = article;
@@ -32,9 +33,9 @@ articlesJson.forEach((article) => {
   articlesTable.addBodyRow(bodyRow);
 });
 
-// =============================================================================
+// // =============================================================================
 
 articlesMarkdown.updateField('LAST_UPDATE_BY', 'javascript ts');
 articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
-articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
-articlesMarkdown.saveFile();
+// articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
+// articlesMarkdown.saveFile();

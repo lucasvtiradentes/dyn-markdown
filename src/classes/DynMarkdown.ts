@@ -17,9 +17,9 @@ const MAKRDOWN_ERRORS = {
   TinvalidSaveFileOptions: 'you must specify a valid options object to saveFile function'
 };
 
-export default class DynMarkdown {
+export default class DynMarkdown<TFields extends string> {
   private updatedFields: string[] = [];
-  fields: string[] = [];
+  fields: TFields[];
   markdownContent = '';
 
   constructor(private markdownPath: string) {
@@ -36,7 +36,7 @@ export default class DynMarkdown {
     const mdByLines = mdContent.split('\n');
     const fields = mdByLines.reduce((acc: string[], cur: string) => (cur.search(`${FIELD_PREFIX}:`) > -1 ? [...acc, cur] : acc), [] as string[]);
     const validatedFields = this.validateFields(fields);
-    return validatedFields;
+    return validatedFields as TFields[];
   }
 
   private validateFields(fields: string[]) {
@@ -95,7 +95,7 @@ export default class DynMarkdown {
 
   /* ======================================================================== */
 
-  updateField(fieldToupdate: string, newContent: string) {
+  updateField(fieldToupdate: TFields, newContent: string) {
     if (!this.fields.includes(fieldToupdate)) {
       throw new Error(MAKRDOWN_ERRORS.missingField(fieldToupdate, this.fields.join(', ')));
     }
@@ -144,7 +144,7 @@ export default class DynMarkdown {
     this.updatedFields.push(fieldToupdate);
   }
 
-  deleteField(field: string) {
+  deleteField(field: TFields) {
     if (!this.fields.includes(field)) {
       throw new Error(MAKRDOWN_ERRORS.missingField(field, this.fields.join(', ')));
     }
