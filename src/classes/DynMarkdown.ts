@@ -6,9 +6,9 @@ import { FILE_STATUS, TDynamicField, TSaveFileOptions, saveFileOptionsSchema } f
 
 export default class DynMarkdown<TFields extends string> {
   #updatedFields: string[] = [];
-  fields: TFields[];
   #markdownContent = '';
   #markdownPath = '';
+  fields: TFields[];
 
   constructor(markdownPath: string) {
     if (!existsSync(markdownPath)) {
@@ -19,6 +19,8 @@ export default class DynMarkdown<TFields extends string> {
     this.#markdownContent = readFileSync(markdownPath, 'utf8');
     this.fields = this.#getFields(this.#markdownContent);
   }
+
+  /* ======================================================================== */
 
   #getFields(mdContent: string) {
     const mdByLines = mdContent.split('\n');
@@ -82,6 +84,9 @@ export default class DynMarkdown<TFields extends string> {
   }
 
   /* ======================================================================== */
+  listHeadingsItemsByStartPattern(startOfLine: string) {
+    return this.#markdownContent.split('\n').filter((line) => new RegExp(`^${startOfLine}`, 'g').test(line));
+  }
 
   updateField(fieldToupdate: TFields, newContent: string) {
     if (!this.fields.includes(fieldToupdate)) {
@@ -227,8 +232,6 @@ export default class DynMarkdown<TFields extends string> {
     this.#markdownContent = finalContent;
     this.fields = this.#getFields(this.#markdownContent);
   }
-
-  /* ======================================================================== */
 
   saveFile(options?: TSaveFileOptions) {
     let finalPath = this.#markdownPath;

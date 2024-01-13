@@ -95,7 +95,7 @@ The `dyn-markdown` comes with the following commands list:
     <th>Description</th>
   </tr>
   <tr>
-    <td rowspan="6">DynMarkdown</td>
+    <td rowspan="7">DynMarkdown</td>
     <td><code>.markdownContent</code></td>
     <td>Access the current markdown file content.</td>
   </tr>
@@ -124,6 +124,12 @@ The `dyn-markdown` comes with the following commands list:
     <td><code>.saveFile({path?, overwrite?})</code></td>
     <td>update the markdown file. you can either save into the same read file or in another one.</td>
   </tr>
+  <tr>
+    <!-- <td rowspan="1">dyn-markdown</td> -->
+    <td><code>.listHeadingsItemsByStartPattern(startLinePattern)</code></td>
+    <td>get the headings items by line start pattern.</td>
+  </tr>
+
   <tr>
     <td rowspan="2">MarkdownTable</td>
     <td><code>.addBodyRow(RowContent[])</code></td>

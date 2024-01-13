@@ -1,5 +1,5 @@
-import { DynMarkdown, MarkdownTable, getJson, TRowContent } from '../../src/index';
 import { join } from 'node:path';
+import { DynMarkdown, MarkdownTable, TRowContent, getJson } from '../../src/index';
 
 type TAndroidItem = {
   category: string;
@@ -39,8 +39,4 @@ androidAppsJson.forEach((item) => {
 });
 
 androidMD.updateField(androidMDDynamicFilds.ANDROID_APPS, androidAppsTable.getTable('category'));
-// androidMD.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${androidAppsJson.length})`);
 androidMD.saveFile();
-
-// console.log(androidAppsJson);
-// console.log(androidMD.markdownContent);
