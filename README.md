@@ -125,12 +125,7 @@ The `dyn-markdown` comes with the following commands list:
     <td>update the markdown file. you can either save into the same read file or in another one.</td>
   </tr>
   <tr>
-    <td rowspan="3">MarkdownTable</td>
-    <td><code>.setHeader(RowContent[])</code></td>
-    <td>set the table header.</td>
-  </tr>
-  <tr>
-    <!-- <td rowspan="4">MarkdownTable</td> -->
+    <td rowspan="2">MarkdownTable</td>
     <td><code>.addBodyRow(RowContent[])</code></td>
     <td>add a row to the table body.</td>
   </tr>

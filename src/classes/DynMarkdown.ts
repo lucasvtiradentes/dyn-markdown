@@ -5,28 +5,29 @@ import { ERRORS } from '../constants/errors';
 import { FILE_STATUS, TDynamicField, TSaveFileOptions, saveFileOptionsSchema } from '../constants/schemas';
 
 export default class DynMarkdown<TFields extends string> {
-  private updatedFields: string[] = [];
+  #updatedFields: string[] = [];
   fields: TFields[];
-  markdownContent = '';
+  #markdownContent = '';
+  #markdownPath = '';
 
-  constructor(private markdownPath: string) {
+  constructor(markdownPath: string) {
     if (!existsSync(markdownPath)) {
       throw new Error(ERRORS.fileDoesNotExist(markdownPath));
     }
 
-    this.markdownPath = markdownPath;
-    this.markdownContent = readFileSync(markdownPath, 'utf8');
-    this.fields = this.getFields(this.markdownContent);
+    this.#markdownPath = markdownPath;
+    this.#markdownContent = readFileSync(markdownPath, 'utf8');
+    this.fields = this.#getFields(this.#markdownContent);
   }
 
-  private getFields(mdContent: string) {
+  #getFields(mdContent: string) {
     const mdByLines = mdContent.split('\n');
     const fields = mdByLines.reduce((acc: string[], cur: string) => (cur.search(`${CONFIGS.FIELD_PREFIX}:`) > -1 ? [...acc, cur] : acc), [] as string[]);
-    const validatedFields = this.validateFields(fields);
+    const validatedFields = this.#validateFields(fields);
     return validatedFields as TFields[];
   }
 
-  private validateFields(fields: string[]) {
+  #validateFields(fields: string[]) {
     const validFields: string[] = [];
 
     const tmpFields: TDynamicField[] = fields.map((fieldStr: string) => {
@@ -87,7 +88,7 @@ export default class DynMarkdown<TFields extends string> {
       throw new Error(ERRORS.missingField(fieldToupdate, this.fields.join(', ')));
     }
 
-    const contentSplitedArr = this.markdownContent.split(/\r?\n/);
+    const contentSplitedArr = this.#markdownContent.split(/\r?\n/);
     const searchString = `${CONFIGS.FIELD_PREFIX}:${fieldToupdate}`;
 
     let initialRow = NaN;
@@ -127,8 +128,8 @@ export default class DynMarkdown<TFields extends string> {
       }
     }, '');
 
-    this.markdownContent = updatedMarkdown;
-    this.updatedFields.push(fieldToupdate);
+    this.#markdownContent = updatedMarkdown;
+    this.#updatedFields.push(fieldToupdate);
   }
 
   deleteField(field: TFields) {
@@ -136,7 +137,7 @@ export default class DynMarkdown<TFields extends string> {
       throw new Error(ERRORS.missingField(field, this.fields.join(', ')));
     }
 
-    const contentSplitedArr = this.markdownContent.split(/\r?\n/);
+    const contentSplitedArr = this.#markdownContent.split(/\r?\n/);
     const searchString = `${CONFIGS.FIELD_PREFIX}:${field}`;
 
     let initialRow = NaN;
@@ -166,8 +167,8 @@ export default class DynMarkdown<TFields extends string> {
       }
     }, '');
 
-    this.markdownContent = updatedMarkdown;
-    this.fields = this.getFields(this.markdownContent);
+    this.#markdownContent = updatedMarkdown;
+    this.fields = this.#getFields(this.#markdownContent);
   }
 
   addSection(content: string, position: 'begin' | 'end' | 'line_after' | 'line_before', searchedLine?: string) {
@@ -175,7 +176,7 @@ export default class DynMarkdown<TFields extends string> {
       throw new Error(ERRORS.mustSpecifyLineToSearch);
     }
 
-    const contentSplitedArr = this.markdownContent.split(/\r?\n/);
+    const contentSplitedArr = this.#markdownContent.split(/\r?\n/);
     let finalContent = '';
 
     if (position === 'begin') {
@@ -223,14 +224,14 @@ export default class DynMarkdown<TFields extends string> {
       }, '');
     }
 
-    this.markdownContent = finalContent;
-    this.fields = this.getFields(this.markdownContent);
+    this.#markdownContent = finalContent;
+    this.fields = this.#getFields(this.#markdownContent);
   }
 
   /* ======================================================================== */
 
   saveFile(options?: TSaveFileOptions) {
-    let finalPath = this.markdownPath;
+    let finalPath = this.#markdownPath;
 
     if (options && !saveFileOptionsSchema.safeParse(options).success) {
       throw new Error(ERRORS.TinvalidSaveFileOptions);
@@ -248,14 +249,14 @@ export default class DynMarkdown<TFields extends string> {
       finalPath = options.path;
     }
 
-    writeFileSync(finalPath, this.markdownContent);
-    const updatedFields = this.updatedFields.length;
+    writeFileSync(finalPath, this.#markdownContent);
+    const updatedFields = this.#updatedFields.length;
 
     if (updatedFields === 1) {
-      console.log(`field ${this.updatedFields[0]} was updated in the [${basename(this.markdownPath)}]`);
+      console.log(`field ${this.#updatedFields[0]} was updated in the [${basename(this.#markdownPath)}]`);
     }
     if (updatedFields > 1) {
-      console.log(`fields [${this.updatedFields.join(', ')}] were updated in the [${basename(this.markdownPath)}]`);
+      console.log(`fields [${this.#updatedFields.join(', ')}] were updated in the [${basename(this.#markdownPath)}]`);
     }
 
     return true;
