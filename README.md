@@ -55,8 +55,6 @@ Easily handle dynamic fields in markdown files, such as quantity fields or even 
 
 <div align="center"><img src="./.github/images/demo.png"></div>
 
-In the <a href="#related">related section</a> and also in [dependents](https://github.com/lucasvtiradentes/markdown-helper/network/dependents) you can see some projects using this package.
-
 ## :dart: Features<a href="#TOC"><img align="right" src="./.github/images/up_arrow.png" width="22"></a>
 
 &nbsp;&nbsp;&nbsp;✔️ easily add, update or remove markdown fields (numbers, tables, etc);<br>
@@ -159,41 +157,41 @@ In short words, we have a [articles.json](./examples/articles.json) and we want 
 In the [articles.md](./examples/articles.md) we have to specify every dynamic field with a special html-like syntax, as it is shown below:
 
 ```markdown
-...
-
 <h3 align="center">
   <!-- <DYNFIELD:ARTICLES_NUMBER> -->
   ALL MY ARTICLES (4)
   <!-- </DYNFIELD:ARTICLES_NUMBER> -->
 </h3>
-
-...
 ```
 
 To update all the desired fields, we create a typescript file with the following content:
 
 ```typescript
-import { DynMarkdown, MarkdownTable, getJson } from '../src/index';
+import { DynMarkdown, MarkdownTable, getJson, TRowContent } from '../../src/index';
 
-type RowContent = MarkdownTable['cellContent'][]; // optional, I put here just to teach how to get the type of table rows
+type TArticleItem = {
+  date: string;
+  title: string;
+  motivation: string;
+  tech: string[];
+};
 
-const articlesJson = getJson('./examples/articles.json');
-const articlesMarkdown = new DynMarkdown('./examples/articles.md');
+type TArticleFields = 'LAST_UPDATE_BY' | 'NODEJS_UTILITIES' | 'ARTICLES_NUMBER';
+const articlesJson: TArticleItem[] = getJson('./examples/articles/articles.json');
+const articlesMarkdown = new DynMarkdown<TArticleFields>('./examples/articles/articles.md');
 
-const articlesTable = new MarkdownTable();
-
-const headerContent: RowContent = [
+const headerContent = [
   { content: 'date', width: 120 },
   { content: 'title', width: 600 },
   { content: 'motivation', width: 300 },
   { content: 'tech', width: 100 }
-];
+] as const satisfies TRowContent;
 
-articlesTable.setHeader(headerContent);
+const articlesTable = new MarkdownTable(headerContent);
 
-articlesJson.forEach((item: any) => {
-  const { date, title, motivation, tech } = item;
-  const bodyRow: RowContent = [
+articlesJson.forEach((article) => {
+  const { date, title, motivation, tech } = article;
+  const bodyRow: TRowContent = [
     { content: date, align: 'center' },
     { content: title, align: 'center' },
     { content: motivation, align: 'left' },
@@ -202,9 +200,10 @@ articlesJson.forEach((item: any) => {
   articlesTable.addBodyRow(bodyRow);
 });
 
-articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
-articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
-articlesMarkdown.saveFile();
+articlesMarkdown.updateField('LAST_UPDATE_BY', 'javascript ts');
+articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable(['date']));
+// articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
+// articlesMarkdown.saveFile();
 ```
 
 After run the above typescript code, all the content will be replaced.
