@@ -79,7 +79,7 @@ it('should read a json and update a markdown table field correctly', () => {
     articlesTable.addBodyRow(bodyRow);
   });
 
-  exampleMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
+  exampleMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable(['date']));
   const result = exampleMarkdown.saveFile({ path: newFile });
   expect(result).toBeTruthy();
   unlinkSync(newFile);

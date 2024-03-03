@@ -1,0 +1,56 @@
+name: PUBLISH
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1 - checkout repo
+        uses: actions/checkout@v3
+
+      - name: 2 - setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: 3 - setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          cache: pnpm
+
+      - name: 4 - disable husky
+        run: echo "HUSKY=0" >> $GITHUB_ENV
+
+      - name: 5 - install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: 6 - run tests
+        run: npm run test:coverage
+
+      - name: 7 - Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
+      - name: 8 - Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,30 @@
+name: BUILD
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1 - checkout repo
+        uses: actions/checkout@v3
+
+      - name: 2 - setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: 3 - setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          cache: pnpm
+
+      - name: 4 - install
+        run: pnpm install --no-frozen-lockfile
+
+      - name: 5 - build
+        run: pnpm run build

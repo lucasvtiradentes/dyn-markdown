@@ -2,6 +2,7 @@
 
 # FOLDERS ###############################
 
+.changeset/
 .github/
 .husky/
 .vscode/
@@ -33,6 +34,7 @@ jest.config.js
 # README.md
 release.config.js
 tsconfig.json
+CONTRIBUTING.md
 
 pnpm-lock.yaml
 package-lock.json
