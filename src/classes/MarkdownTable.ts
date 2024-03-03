@@ -36,19 +36,24 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
     return isValidRow;
   }
 
-  #getBodyMd(allBody: TRowContent[], columnToJoinIndex?: number) {
-    let allBodyMD = '';
-    const uniqueItems: string[] = [];
+  #getBodyMd(allRows: TRowContent[], columnsToJoin?: number[]) {
+    let allRowsMD = '';
+    const itemsMap = new Map();
+    if (columnsToJoin) {
+      columnsToJoin.forEach((key) => itemsMap.set(key, []));
+    }
 
-    for (const body of allBody) {
+    for (const row of allRows) {
       let curRow = '';
 
-      body.forEach((col, index) => {
-        if (columnToJoinIndex !== undefined && index === columnToJoinIndex) {
-          if (!uniqueItems.includes(col.content)) {
-            const qnt = allBody.map((item) => item[columnToJoinIndex]).filter((item) => item?.content === col.content).length;
-            uniqueItems.push(col.content);
-            curRow = curRow + this.#addRow(col, ROW_TYPE.body, { quantity: qnt }) + '\n';
+      row.forEach((col, colIndex) => {
+        const current = itemsMap.get(colIndex);
+
+        if (columnsToJoin !== undefined && columnsToJoin.includes(colIndex)) {
+          if (!current.includes(col.content)) {
+            const cellCount = allRows.map((item) => item[colIndex]).filter((item) => item?.content === col.content).length;
+            itemsMap.set(colIndex, [...current, col.content]);
+            curRow = curRow + this.#addRow(col, ROW_TYPE.body, { quantity: cellCount }) + '\n';
           } else {
             curRow = curRow + this.#addRow(col, ROW_TYPE.body, { comment: true }) + '\n';
           }
@@ -58,10 +63,10 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
       });
 
       curRow = '  <tr>' + '\n' + curRow + '  </tr>';
-      allBodyMD = (allBodyMD === '' ? '' : allBodyMD + '\n') + curRow;
+      allRowsMD = (allRowsMD === '' ? '' : allRowsMD + '\n') + curRow;
     }
 
-    return allBodyMD;
+    return allRowsMD;
   }
 
   #addRow(col: TCellContent, type: keyof typeof ROW_TYPE, options?: { quantity?: number; comment?: true }) {
@@ -100,17 +105,20 @@ export default class MarkdownTable<TColumnItem extends ReadonlyArray<TCellConten
     this.#bodyItems.push(body);
   }
 
-  getTable(columnToJoin?: ExtractContent<TColumnItem>[number]) {
+  getTable(columnsToJoin?: ExtractContent<TColumnItem>[number][]) {
     let finalBody = '';
 
-    if (columnToJoin) {
+    if (columnsToJoin) {
       const allColumns = this.#headerItems.map((item) => item.content);
-      if (!allColumns.includes(columnToJoin)) {
-        throw new Error(ERRORS.columnNotFound(columnToJoin, allColumns.join(', ')));
+
+      for (const column of columnsToJoin) {
+        if (!allColumns.includes(column)) {
+          throw new Error(ERRORS.columnNotFound(column, allColumns.join(', ')));
+        }
       }
 
-      const columnIndex = this.#headerItems.findIndex((item) => item.content === columnToJoin);
-      finalBody = this.#getBodyMd(this.#bodyItems, columnIndex);
+      const columnsToMerge = columnsToJoin.map((columnToJoin) => this.#headerItems.findIndex((header) => header.content === columnToJoin));
+      finalBody = this.#getBodyMd(this.#bodyItems, columnsToMerge);
     } else {
       finalBody = this.#getBodyMd(this.#bodyItems);
     }

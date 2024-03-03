@@ -36,6 +36,6 @@ articlesJson.forEach((article) => {
 // // =============================================================================
 
 articlesMarkdown.updateField('LAST_UPDATE_BY', 'javascript ts');
-articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable('date'));
+articlesMarkdown.updateField('NODEJS_UTILITIES', articlesTable.getTable(['date']));
 // articlesMarkdown.updateField('ARTICLES_NUMBER', `ALL MY ARTICLES (${articlesJson.length})`);
 // articlesMarkdown.saveFile();

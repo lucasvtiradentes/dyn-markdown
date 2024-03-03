@@ -137,7 +137,7 @@ The `dyn-markdown` comes with the following commands list:
   </tr>
   <tr>
     <!-- <td rowspan="4">MarkdownTable</td> -->
-    <td><code>.getTable(columnToJoin?)</code></td>
+    <td><code>.getTable(columnToJoin[]?)</code></td>
     <td>get the table final content. if specified it also merge rows with the same value.</td>
   </tr>
   <tr>

@@ -38,5 +38,5 @@ androidAppsJson.forEach((item) => {
   androidAppsTable.addBodyRow(bodyRow);
 });
 
-androidMD.updateField(androidMDDynamicFilds.ANDROID_APPS, androidAppsTable.getTable('category'));
+androidMD.updateField(androidMDDynamicFilds.ANDROID_APPS, androidAppsTable.getTable(['category']));
 androidMD.saveFile();
